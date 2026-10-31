@@ -9,7 +9,7 @@ import { CompanyCard } from "@/components/CompanyCard";
 import { Icon } from "@/components/Icon";
 import { BTN_GHOST, BTN_INK, BTN_SAFFRON, INPUT, Loading, Micro } from "@/components/ui";
 import { useI18n } from "@/lib/i18n";
-import { KD_PROFILE, KD_REQUEST } from "@/lib/samples";
+import { KD_PROFILE } from "@/lib/samples";
 import { companyFor, getSession, guestSession, loadProfile, saveProfile, saveRequest, type Session } from "@/lib/store";
 import { COUNTRIES, COUNTRY_CODES, SECTORS, SECTOR_LABEL, STAGES, STAGE_LABEL, type Profile, type Request } from "@/lib/types";
 import { cn, fileToBase64, logoToDataUrl } from "@/lib/utils";
@@ -42,8 +42,9 @@ export default function StartPage() {
     if (params.get("sample") === "kd") {
       // Always a guest, so the sample never overwrites a real account's profile.
       s = s?.guest ? s : guestSession();
+      // Only the profile: the dashboard then asks what KD is looking for.
       saveProfile(s.email, KD_PROFILE);
-      saveRequest(s.email, KD_REQUEST);
+      saveRequest(s.email, null);
       router.replace("/dashboard");
       return;
     }
@@ -52,6 +53,9 @@ export default function StartPage() {
       return;
     }
     setSession(s);
+    const wanted = params.get("mode");
+    if (wanted === "upload") setMode("upload");
+    if (wanted === "form") setDraft(blank(companyFor(s.email)));
     if (params.get("edit")) {
       const saved = loadProfile(s.email);
       if (saved) setDraft(saved);
@@ -60,8 +64,11 @@ export default function StartPage() {
 
   const finish = (p: Profile, r?: Request | null) => {
     if (!session) return;
+    const changedCompany = loadProfile(session.email)?.id !== p.id;
     saveProfile(session.email, p);
+    // A new company starts with a clean "what do you need"; Gemma's guess from the deck pre-fills it.
     if (r) saveRequest(session.email, r);
+    else if (changedCompany) saveRequest(session.email, null);
     router.push("/dashboard");
   };
 
@@ -99,7 +106,7 @@ export default function StartPage() {
               ))}
             </div>
             <div className="mt-6">
-              {mode === "sample" ? <SamplePick onOpen={() => finish(KD_PROFILE, KD_REQUEST)} onReview={() => (setFound(KD_REQUEST), setDraft(KD_PROFILE))} /> : null}
+              {mode === "sample" ? <SamplePick onOpen={() => finish(KD_PROFILE, null)} onReview={() => setDraft(KD_PROFILE)} /> : null}
               {mode === "upload" ? (
                 <UploadBox
                   onDone={(p, r) => {
@@ -157,7 +164,7 @@ function SamplePick({ onOpen, onReview }: { onOpen: () => void; onReview: () => 
           <p className="mt-4 text-[12px] text-ink-3">{t("start.kd.from")}</p>
         </div>
       </article>
-      <CompanyCard profile={KD_PROFILE} request={KD_REQUEST} className="nx-rise hidden md:block" />
+      <CompanyCard profile={KD_PROFILE} className="nx-rise hidden md:block" />
     </div>
   );
 }
