@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Nexa ASEAN: a white page and white boxes, in the colours of the ASEAN flag.
+   Blue is for actions. Teal (new) means "strong fit", gold means "partial",
+   red means "not yet". Those three never mean anything else.
+--------------------------------------------------------------------------- */
+
+@theme inline {
+  --font-sans: var(--font-jakarta);
+  --font-mono: var(--font-jbmono);
+
+  --color-paper: #ffffff;
+  --color-paper-2: #f7f9fc;
+  --color-stone: #edf1f7;
+  --color-line: #e4e8f1;
+  --color-line-strong: #c9d0e0;
+  --color-ink: #12162e;
+  --color-ink-2: #4b5170;
+  --color-ink-3: #8a90aa;
+
+  --color-blue: #0033a0;
+  --color-blue-2: #2f5bd3;
+  --color-blue-soft: #e9effc;
+  --color-red: #d0103a;
+  --color-red-soft: #fdedf0;
+  --color-gold: #e9a41c;
+  --color-gold-deep: #a86f00;
+  --color-gold-soft: #fdf5e3;
+  --color-teal: #0e9f9a;
+  --color-teal-deep: #087571;
+  --color-teal-soft: #e3f5f4;
+  --color-sky: #d9ecfa;
+}
+
+html {
+  background: #ffffff;
+  color: var(--color-ink);
+}
+body {
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: var(--color-blue);
+  color: #fff;
+}
+
+@layer components {
+/* The one box: every card in the product is this card. */
+.box {
+  border-radius: 1rem;
+  border: 1px solid rgb(201 208 224 / 0.6);
+  background: #fff;
+  box-shadow: 0 14px 34px -24px rgb(0 0 0 / 0.45);
+}
+.box-lift {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+}
+.box-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 40px -26px rgb(0 33 120 / 0.5);
+}
+
+.micro {
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.btn {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.6rem;
+  padding: 0 1.25rem;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+}
+.btn:active { transform: scale(0.98); }
+.btn-blue { background: var(--color-blue); color: #fff; }
+.btn-blue:hover { background: #00247a; }
+.btn-line { border: 1px solid var(--color-ink); color: var(--color-ink); }
+.btn-line:hover { background: var(--color-ink); color: #fff; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+/* ── motion ─────────────────────────────────────────── */
+@keyframes drift { 0%,100% { transform: translateX(0); } 50% { transform: translateX(14px); } }
+.drift { animation: drift 16s ease-in-out infinite; }
+.drift-slow { animation: drift 24s ease-in-out infinite reverse; }
+
+@keyframes dash { to { stroke-dashoffset: -24; } }
+.dash { animation: dash 1.2s linear infinite; }
+
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+.blink { animation: blink 1.4s ease-in-out infinite; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes pop { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+.pop { animation: pop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; transform-box: fill-box; transform-origin: center; }
+
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+.bob { animation: bob 3s ease-in-out infinite; }
+
+@keyframes pulse-dot { 0%,100% { opacity: 0.25; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
+.dot { animation: pulse-dot 1.2s ease-in-out infinite; }
+
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee { animation: marquee 45s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .drift, .drift-slow, .dash, .blink, .rise, .pop, .bob, .dot, .marquee { animation: none !important; }
+  .box-lift:hover { transform: none; }
+}
