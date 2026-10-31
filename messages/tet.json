@@ -114,7 +114,6 @@
  "start.reading": "Gemma 4 lee hela…",
  "start.formats": "PDF, PowerPoint (.pptx), Word (.docx), imajen ka .txt · to'o 8 MB",
  "start.choose": "Hili file",
- "start.sampleDeck": "Uza sample deck",
  "start.orType": "Ka deskreve ita-boot nia kompañia iha liña balu",
  "start.typePh": "Ami startup agritech ho ema na'5 iha Jakarta. Pre-seed. Ami ajuda agrikultór hare...",
  "start.readText": "Lee ho Gemma 4",
@@ -276,5 +275,8 @@
  "need.uploadS": "Pitch deck, planu finansiamentu ka brief badak ida. Gemma 4 sei lee no buka oportunidade ba ita.",
  "need.kdPitch": "Uza KD nia ezemplu pitch",
  "need.or": "Ka hili rasik",
- "need.drop": "Drop file PDF, PowerPoint ka Word iha ne'e"
+ "need.drop": "Drop file PDF, PowerPoint ka Word iha ne'e",
+ "start.sampleDeck": "Uza ezemplu husi TalentLabs",
+ "start.samplePdf": "Laiha failu? Download ezemplu: perfil kompañia TalentLabs (PDF)",
+ "need.samplePdf": "Download KD nia brief (PDF) atu koko upload"
 }

@@ -114,7 +114,6 @@
  "start.reading": "Gemma 4 正在读取中…",
  "start.formats": "PDF, PowerPoint (.pptx), Word (.docx), 图片或 .txt · 最高 8 MB",
  "start.choose": "选择文件",
- "start.sampleDeck": "使用示例演示文稿",
  "start.orType": "或用几行字描述您的公司",
  "start.typePh": "我们是一家位于雅加达的 5 人农业科技初创公司。处于种子前阶段。我们帮助稻农……",
  "start.readText": "使用 Gemma 4 阅读",
@@ -276,5 +275,8 @@
  "need.uploadS": "上传商业计划书 (Pitch Deck)、融资计划或简短简介。Gemma 4 会阅读并为您寻找机会。",
  "need.kdPitch": "使用 KD 的示例计划书",
  "need.or": "或自行选择",
- "need.drop": "将 PDF, PowerPoint 或 Word 文件拖放到此处"
+ "need.drop": "将 PDF, PowerPoint 或 Word 文件拖放到此处",
+ "start.sampleDeck": "使用 TalentLabs 示例",
+ "start.samplePdf": "没有文件？下载示例：TalentLabs 公司简介 (PDF)",
+ "need.samplePdf": "下载 KD 的简介 (PDF) 以进行上传测试"
 }

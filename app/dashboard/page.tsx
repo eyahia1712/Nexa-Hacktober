@@ -107,16 +107,6 @@ export default function Dashboard() {
     <div className="min-h-dvh bg-paper text-ink">
       <AppHeader />
 
-      {profile.source === "sample" ? (
-        <div className="border-b border-line bg-saffron-soft">
-          <div className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center gap-3 px-5 py-2 text-[13px] md:px-8">
-            <span>{t("dash.sampleBanner", { name: profile.name })}</span>
-            <Link href="/login" className="underline underline-offset-4">
-              {t("dash.own")}
-            </Link>
-          </div>
-        </div>
-      ) : null}
 
       <main className="mx-auto w-full max-w-[1240px] px-5 pt-7 pb-20 md:px-8">
         <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,330px)_minmax(0,1fr)] lg:gap-10">
@@ -279,6 +269,12 @@ function NeedComposer({ profile, initial, onDone }: { profile: Profile; initial:
           }}
         />
         {error ? <p className="mt-4 text-[13px] text-bad">{error}</p> : null}
+        {isKd ? (
+          <a href="/samples/krackeddevs-what-we-need.pdf" download className="mt-5 inline-flex items-center gap-1.5 text-[13px] text-asean underline-offset-4 hover:underline">
+            <Icon name="doc" size={14} />
+            {t("need.samplePdf")}
+          </a>
+        ) : null}
       </div>
 
       <div className="my-6 flex items-center gap-4">

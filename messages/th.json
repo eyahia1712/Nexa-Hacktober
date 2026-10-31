@@ -114,7 +114,6 @@
  "start.reading": "Gemma 4 กำลังอ่านข้อมูล…",
  "start.formats": "PDF, PowerPoint (.pptx), Word (.docx), รูปภาพ หรือ .txt · สูงสุด 8 MB",
  "start.choose": "เลือกไฟล์",
- "start.sampleDeck": "ใช้ตัวอย่าง Pitch Deck",
  "start.orType": "หรืออธิบายบริษัทของคุณสั้นๆ",
  "start.typePh": "เราเป็นสตาร์ทอัพด้าน agritech ทีม 5 คนในจาการ์ตา อยู่ในระยะ Pre-seed เราช่วยเกษตรกรผู้ปลูกข้าว...",
  "start.readText": "อ่านด้วย Gemma 4",
@@ -276,5 +275,8 @@
  "need.uploadS": "Pitch deck, แผนการระดมทุน หรือสรุปข้อมูลสั้นๆ Gemma 4 จะอ่านข้อมูลและค้นหาโอกาสที่เหมาะสมให้คุณ",
  "need.kdPitch": "ใช้ตัวอย่าง Pitch ของ KD",
  "need.or": "หรือเลือกด้วยตัวเอง",
- "need.drop": "วางไฟล์ PDF, PowerPoint หรือ Word ที่นี่"
+ "need.drop": "วางไฟล์ PDF, PowerPoint หรือ Word ที่นี่",
+ "start.sampleDeck": "ใช้ตัวอย่างจาก TalentLabs",
+ "start.samplePdf": "ยังไม่มีไฟล์? ดาวน์โหลดตัวอย่าง: โปรไฟล์บริษัท TalentLabs (PDF)",
+ "need.samplePdf": "ดาวน์โหลดสรุปข้อมูลของ KD (PDF) เพื่อทดลองอัปโหลด"
 }

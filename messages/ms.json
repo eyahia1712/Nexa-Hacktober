@@ -114,7 +114,6 @@
  "start.reading": "Gemma 4 sedang membacanya…",
  "start.formats": "PDF, PowerPoint (.pptx), Word (.docx), imej atau .txt · sehingga 8 MB",
  "start.choose": "Pilih fail",
- "start.sampleDeck": "Guna deck sampel",
  "start.orType": "Atau huraikan syarikat anda dalam beberapa baris",
  "start.typePh": "Kami adalah startup agritech 5 orang di Jakarta. Pre-seed. Kami membantu petani padi…",
  "start.readText": "Baca dengan Gemma 4",
@@ -276,5 +275,8 @@
  "need.uploadS": "Pitch deck, pelan pembiayaan atau ringkasan pendek. Gemma 4 akan membacanya dan mencari peluang untuk anda.",
  "need.kdPitch": "Gunakan pitch sampel KD",
  "need.or": "Atau pilih sendiri",
- "need.drop": "Letakkan fail PDF, PowerPoint atau Word di sini"
+ "need.drop": "Letakkan fail PDF, PowerPoint atau Word di sini",
+ "start.sampleDeck": "Gunakan sampel TalentLabs",
+ "start.samplePdf": "Tiada fail? Muat turun sampel: profil syarikat TalentLabs (PDF)",
+ "need.samplePdf": "Muat turun ringkasan KD (PDF) untuk mencuba fungsi muat naik"
 }
