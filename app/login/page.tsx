@@ -44,6 +44,12 @@ export default function LoginPage() {
       router.push(`/start?mode=${p}`);
       return;
     }
+    // Upload opens the file picker screen right away; an account can come later.
+    if (p === "upload") {
+      if (!s) guestSession();
+      router.push("/start?mode=upload");
+      return;
+    }
     setPath(p);
   };
 
