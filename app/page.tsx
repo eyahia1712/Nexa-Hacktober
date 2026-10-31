@@ -54,7 +54,10 @@ function Nav() {
             </a>
           ))}
         </nav>
-        <Link href="/app" className="btn btn-blue ml-auto min-h-9 text-[13px]">
+        <Link href="/events" className="micro ml-auto px-3 py-2 text-ink-2 transition-colors hover:text-ink">
+          Events
+        </Link>
+        <Link href="/app" className="btn btn-blue min-h-9 text-[13px]">
           Find my opportunities
         </Link>
       </div>

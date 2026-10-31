@@ -1,8 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Logo } from "./Brand";
 import { Icon, ScoreRing } from "./Icon";
+import { NotificationBell } from "./NotificationBell";
+import { getJson, personHeaders, post, sectorLabel, store } from "@/lib/client";
 import { matchAll } from "@/lib/match";
 import { OPPORTUNITIES } from "@/lib/opportunities";
 import {
@@ -16,6 +19,8 @@ import {
   TRACK_STAGES,
   TYPE_LABEL,
   type Country,
+  type EventRec,
+  type EventSummary,
   type Match,
   type Opportunity,
   type OppType,
@@ -24,25 +29,9 @@ import {
 } from "@/lib/types";
 
 type FilePart = { mime: string; data: string; name: string };
-type Mode = "gemma" | "sample";
+type Mode = "gemma" | "sample" | "manual";
 
 // ── helpers ──────────────────────────────────────────────────
-const store = {
-  get<T>(k: string, fallback: T): T {
-    try {
-      const v = localStorage.getItem(k);
-      return v ? (JSON.parse(v) as T) : fallback;
-    } catch {
-      return fallback;
-    }
-  },
-  set(k: string, v: unknown) {
-    try {
-      localStorage.setItem(k, JSON.stringify(v));
-    } catch {}
-  },
-};
-
 function readFile(f: File): Promise<FilePart> {
   return new Promise((resolve, reject) => {
     const r = new FileReader();
@@ -51,15 +40,6 @@ function readFile(f: File): Promise<FilePart> {
     r.readAsDataURL(f);
   });
 }
-
-async function post<T>(url: string, body: unknown): Promise<T> {
-  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || "Something went wrong");
-  return json as T;
-}
-
-const sectorLabel = (s: string) => (s === "ai" ? "AI" : s === "saas" ? "SaaS" : s.charAt(0).toUpperCase() + s.slice(1));
 
 function deadline(m: Match) {
   if (m.daysLeft === null) return { text: "Rolling", tone: "text-ink-2 bg-stone" };
@@ -136,12 +116,17 @@ export function Workspace({ autoSample }: { autoSample: boolean }) {
               ))}
             </nav>
           )}
+          <Link href="/events" className={`micro flex items-center gap-1.5 px-2 py-2 text-ink-2 transition-colors hover:text-blue ${profile ? "" : "ml-auto"}`}>
+            <Icon name="calendar" size={15} /> Events
+          </Link>
+          <Link href="/me" className="micro px-2 py-2 text-ink-2 transition-colors hover:text-blue">Me</Link>
+          <NotificationBell />
           {profile ? (
             <button onClick={reset} className="btn btn-line min-h-9 text-[13px]">
               <Icon name="upload" size={15} /> New deck
             </button>
           ) : (
-            <span className="micro ml-auto hidden text-ink-3 sm:block">Gemma 4 · Startup ASEAN</span>
+            <span className="micro hidden text-ink-3 sm:block">Gemma 4 · Startup ASEAN</span>
           )}
         </div>
       </header>
@@ -153,7 +138,7 @@ export function Workspace({ autoSample }: { autoSample: boolean }) {
           {mode === "sample" && (
             <div className="box flex items-center gap-3 border-gold/40 bg-gold-soft px-4 py-3 text-[13px] text-ink-2">
               <Icon name="alert" size={16} className="text-gold-deep" /> Sample mode: add <code className="font-mono">GEMINI_API_KEY</code> to
-              <code className="font-mono">.env.local</code> for live Gemma 4.
+              <code className="font-mono">.env.local</code> for live Gemma 4, or press New deck → Fill in a form to add your own startup.
             </div>
           )}
           <ProfileBanner profile={profile} mode={mode} onEdit={() => setEditOpen(true)} />
@@ -170,6 +155,7 @@ export function Workspace({ autoSample }: { autoSample: boolean }) {
                 />
                 <aside className="space-y-5 lg:sticky lg:top-24">
                   <AskNexa profile={profile} matches={matches} />
+                  <EventsForYou profile={profile} />
                   <CountryChart matches={matches} />
                 </aside>
               </div>
@@ -202,6 +188,7 @@ function Intake({ autoSample, onDone }: { autoSample: boolean; onDone: (p: Profi
   const [files, setFiles] = useState<FilePart[]>([]);
   const [text, setText] = useState("");
   const [showText, setShowText] = useState(false);
+  const [manual, setManual] = useState(false);
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState(0);
   const [error, setError] = useState("");
@@ -299,6 +286,8 @@ function Intake({ autoSample, onDone }: { autoSample: boolean; onDone: (p: Profi
               ))}
             </ul>
           </div>
+        ) : manual ? (
+          <ManualProfile onDone={(p) => onDone(p, "manual")} onBack={() => setManual(false)} />
         ) : (
           <>
             <button
@@ -339,6 +328,9 @@ function Intake({ autoSample, onDone }: { autoSample: boolean; onDone: (p: Profi
                 No deck? Describe it instead
               </button>
             )}
+            <button onClick={() => setManual(true)} className="ml-4 mt-4 text-[13px] font-semibold text-ink-2 underline-offset-4 hover:text-blue hover:underline">
+              Fill in a form
+            </button>
 
             {error && <p className="mt-4 rounded-lg bg-red-soft px-4 py-3 text-[13px] font-semibold text-red">{error}</p>}
 
@@ -357,6 +349,108 @@ function Intake({ autoSample, onDone }: { autoSample: boolean; onDone: (p: Profi
   );
 }
 
+/** No deck and no AI key: the founder types the profile in. */
+function ManualProfile({ onDone, onBack }: { onDone: (p: Profile) => void; onBack: () => void }) {
+  const [p, setP] = useState<Profile>({
+    name: "",
+    oneLiner: "",
+    country: "MY",
+    sector: "saas",
+    stage: "pre-seed",
+    teamSize: 2,
+    needs: ["funding"],
+    targetMarkets: [],
+    ask: "",
+  });
+  const set = <K extends keyof Profile>(k: K, v: Profile[K]) => setP((x) => ({ ...x, [k]: v }));
+  const toggle = <T,>(arr: T[], v: T) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
+  const field = "mt-1.5 h-10 w-full rounded-lg border border-line-strong bg-white px-3 text-[14px] font-semibold normal-case tracking-normal text-ink outline-none focus:border-blue";
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onDone({ ...p, name: p.name.trim(), oneLiner: p.oneLiner.trim(), ask: p.ask?.trim() || undefined });
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <p className="text-[17px] font-semibold">Your startup</p>
+        <button type="button" onClick={onBack} className="micro text-ink-3 hover:text-blue">← Upload instead</button>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <label className="micro col-span-2 text-ink-3">
+          Name
+          <input required value={p.name} onChange={(e) => set("name", e.target.value)} placeholder="PadiGuard" className={field} />
+        </label>
+        <label className="micro col-span-2 text-ink-3">
+          One line on what you build
+          <input value={p.oneLiner} onChange={(e) => set("oneLiner", e.target.value)} placeholder="Crop-disease alerts for rice farmers" className={field} />
+        </label>
+        <label className="micro text-ink-3">
+          Based in
+          <select className={field} value={p.country} onChange={(e) => set("country", e.target.value as Country)}>
+            {COUNTRY_CODES.map((c) => (
+              <option key={c} value={c}>{COUNTRIES[c].flag} {COUNTRIES[c].name}</option>
+            ))}
+          </select>
+        </label>
+        <label className="micro text-ink-3">
+          Sector
+          <select className={field} value={p.sector} onChange={(e) => set("sector", e.target.value as Profile["sector"])}>
+            {SECTORS.map((s) => (
+              <option key={s} value={s}>{sectorLabel(s)}</option>
+            ))}
+          </select>
+        </label>
+        <label className="micro text-ink-3">
+          Stage
+          <select className={field} value={p.stage} onChange={(e) => set("stage", e.target.value as Profile["stage"])}>
+            {STAGES.map((s) => (
+              <option key={s} value={s}>{STAGE_LABEL[s]}</option>
+            ))}
+          </select>
+        </label>
+        <label className="micro text-ink-3">
+          Team size
+          <input type="number" min={1} value={p.teamSize} onChange={(e) => set("teamSize", Math.max(1, Number(e.target.value) || 1))} className={field} />
+        </label>
+        <label className="micro col-span-2 text-ink-3">
+          Raising
+          <input value={p.ask} onChange={(e) => set("ask", e.target.value)} placeholder="US$ 300k pre-seed" className={field} />
+        </label>
+      </div>
+      <p className="micro mt-4 text-ink-3">Needs</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {NEEDS.map((n) => (
+          <button
+            type="button"
+            key={n}
+            onClick={() => set("needs", toggle(p.needs, n))}
+            className={`rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition ${p.needs.includes(n) ? "border-red bg-red text-white" : "border-line text-ink-2 hover:border-red"}`}
+          >
+            {NEED_LABEL[n]}
+          </button>
+        ))}
+      </div>
+      <p className="micro mt-4 text-ink-3">Expanding to</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {COUNTRY_CODES.filter((c) => c !== p.country).map((c) => (
+          <button
+            type="button"
+            key={c}
+            onClick={() => set("targetMarkets", toggle(p.targetMarkets, c))}
+            className={`rounded-full border px-2.5 py-1.5 text-[12.5px] font-semibold transition ${p.targetMarkets.includes(c) ? "border-blue bg-blue text-white" : "border-line text-ink-2 hover:border-blue"}`}
+          >
+            {COUNTRIES[c].flag} {COUNTRIES[c].name}
+          </button>
+        ))}
+      </div>
+      <button disabled={!p.name.trim() || !p.needs.length} className="btn btn-blue mt-5 w-full">
+        Find my opportunities <Icon name="arrow" size={16} />
+      </button>
+    </form>
+  );
+}
+
 // ── Profile banner ───────────────────────────────────────────
 function ProfileBanner({ profile: p, mode, onEdit }: { profile: Profile; mode: Mode | null; onEdit: () => void }) {
   return (
@@ -369,7 +463,7 @@ function ProfileBanner({ profile: p, mode, onEdit }: { profile: Profile; mode: M
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-[22px] font-semibold tracking-tight">{p.name}</h1>
             <span className="micro inline-flex items-center gap-1 rounded-full bg-teal-soft px-2 py-0.5 text-teal-deep">
-              <Icon name="spark" size={12} stroke={2.4} /> {mode === "gemma" ? "Read by Gemma 4" : "Sample"}
+              <Icon name="spark" size={12} stroke={2.4} /> {mode === "gemma" ? "Read by Gemma 4" : mode === "manual" ? "Entered by you" : "Sample"}
             </span>
           </div>
           <p className="mt-1 line-clamp-1 text-[14px] text-ink-2">{p.oneLiner}</p>
@@ -705,6 +799,49 @@ function AskNexa({ profile, matches }: { profile: Profile; matches: Match[] }) {
           <Icon name="send" size={15} />
         </button>
       </form>
+    </section>
+  );
+}
+
+/** Upcoming events open to startups that cover this startup's sector. */
+function EventsForYou({ profile }: { profile: Profile }) {
+  const [events, setEvents] = useState<EventSummary[] | null>(null);
+  useEffect(() => {
+    // With a Nexa profile, the server ranks events by who's in the room; otherwise filter by sector here.
+    if (personHeaders()["x-person-key"]) {
+      getJson<{ recommended: EventRec[] }>("/api/me")
+        .then((r) => setEvents(r.recommended.map((x) => x.event)))
+        .catch(() => setEvents([]));
+      return;
+    }
+    getJson<{ events: EventSummary[] }>("/api/events")
+      .then((j) => setEvents(j.events))
+      .catch(() => setEvents([]));
+  }, []);
+  const now = Date.now();
+  const fit = (events ?? [])
+    .filter((e) => new Date(e.end).getTime() > now && e.audience.includes("startup") && (e.sectors === "any" || e.sectors.includes(profile.sector)))
+    .slice(0, 3);
+
+  return (
+    <section className="box p-5">
+      <div className="flex items-center justify-between">
+        <p className="micro text-ink-3">Events for you</p>
+        <Link href="/events" className="micro text-blue hover:underline">All</Link>
+      </div>
+      <div className="mt-3 space-y-2">
+        {fit.map((e) => (
+          <Link key={e.id} href={`/events/${e.id}`} className="block rounded-xl border border-line p-3 transition hover:border-blue">
+            <p className="font-mono text-[11px] text-ink-3">
+              {new Date(e.start).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} · {e.format === "online" ? "Online" : `${COUNTRIES[e.country].flag} ${e.city}`}
+            </p>
+            <p className="mt-0.5 text-[13.5px] font-semibold leading-snug">{e.title}</p>
+            <p className="mt-1 text-[12px] text-ink-3">{e.counts.vc} investors registered</p>
+          </Link>
+        ))}
+        {events && !fit.length && <p className="text-[13px] text-ink-3">No upcoming events for {sectorLabel(profile.sector)} yet.</p>}
+        {!events && <div className="h-16 animate-pulse rounded-xl bg-stone" />}
+      </div>
     </section>
   );
 }

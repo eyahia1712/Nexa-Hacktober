@@ -21,6 +21,11 @@ const PATHS = {
   copy: "M8 8h12v12H8zM16 8V4H4v12h4",
   trash: "M5 7h14M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3",
   flag: "M5 21V4m0 0h11l-2 4 2 4H5",
+  pin: "M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Zm0-9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
+  users: "M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 9c0-3.3 2.7-6 6-6s6 2.7 6 6m1-9a3 3 0 1 0 0-6m2.5 15c0-2.6-1.4-4.8-3.5-5.6",
+  plus: "M12 5v14M5 12h14",
+  clock: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-13v4.5l3 2",
+  download: "M12 4v12m0 0-5-5m5 5 5-5M4 20h16",
 } as const;
 
 export type IconName = keyof typeof PATHS;
