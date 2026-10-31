@@ -8,10 +8,8 @@ step-by-step pathway to each one, in 12 languages.**
 
 ![Nexa: Eleven countries. One door.](docs/screenshots/nexa-hero.jpg)
 
-![Built for the moment a founder asks: "Where do I even apply?"](docs/screenshots/nexa-who.jpg)
-
-*One door for every founder. KrackedDevs, PadiGuard, Kipay and Medora each get
-their best-fit opportunity, scored by rules that anyone can check.*
+*One door for every founder: the grants, investors and programmes that fit,
+across all 11 ASEAN countries, scored by rules anyone can check.*
 
 ---
 
@@ -23,15 +21,15 @@ their best-fit opportunity, scored by rules that anyone can check.*
 | **Hackathon** | Hacktoberfest Hack Day Kuala Lumpur · 31 Oct 2026 · DOJO Coworking KL |
 | **Challenge** | Startup ASEAN · Problem Statement 2: Ecosystem Gateway |
 | **Prize Categories** | Best Use of Gemma 4 · Best Open-Source AI Project |
-| **Team Leader** | *To be added* |
-| **Number of Members** | *To be added* |
+| **Team Leader** | Eya Hia |
+| **Number of Members** | 4 · Table 12 |
 
 ## 🔗 Links
 
 | Resource | Link |
 |---|---|
 | 💻 **GitHub Repository** | **[github.com/eyahia1712/Nexa-Hacktober](https://github.com/eyahia1712/Nexa-Hacktober)** |
-| 🎬 **Demo Video** | *To be added* |
+| 🎬 **Demo Video** | **[Watch the Nexa demo (Google Drive)](https://drive.google.com/file/d/1udZzNIyfPSlRVW7VVo-cMQ3Qe0H0N_d3/view?usp=sharing)** |
 | 🌐 **Live Demo** | *To be added* |
 | 📄 **Sample files to upload** | [TalentLabs company profile (PDF)](public/samples/talentlabs-company-profile.pdf) · [KrackedDevs "what we need" brief (PDF)](public/samples/krackeddevs-what-we-need.pdf) |
 
@@ -139,34 +137,14 @@ the ones that fit them.
 - **Accounts**: create an account or sign in; judges can open the sample with no account
 - **Events** (06 Events tab, `/events`, `/me`): register, see who is at the event ranked by fit, mutual interest unlocks an intro, hosts track intros to deals
 
-![Three ways to start: sample profile, upload documents, or create it manually](docs/screenshots/start-options.jpg)
-
-*Three ways to start. The KrackedDevs sample needs no account.*
-
-![Gemma 4 turns the TalentLabs company PDF into a profile, logo included](docs/screenshots/upload-profile.jpg)
-
-*Upload the TalentLabs PDF: Gemma 4 fills in the profile and Nexa finds the logo.*
-
 ![The KrackedDevs dashboard: profile on the left, matches and KPIs on the right](docs/screenshots/dashboard.jpg)
 
 *The dashboard: the company card on the left, and on the right what they need,
 strong fits, the best score, deadlines and countries with a match.*
 
-![Opportunity cards with fit score, reasons, amount and deadline](docs/screenshots/opportunities.jpg)
-
-*Every opportunity is a card with its score, the reasons, the amount and the deadline.*
-
 ![A pathway to Google for Startups Accelerator, planned by Gemma 4](docs/screenshots/pathway.jpg)
 
 *A step-by-step route, the documents to prepare and a tip, planned by Gemma 4.*
-
-![Ask Nexa answering in Bahasa Indonesia](docs/screenshots/ask-nexa.jpg)
-
-*Ask in Bahasa Indonesia, get the answer in Bahasa Indonesia.*
-
-![The whole dashboard in Thai](docs/screenshots/thai-interface.jpg)
-
-*The same dashboard in Thai. One click in the language menu.*
 
 ### Tech Stack
 
@@ -363,6 +341,12 @@ npm run typecheck
 
 | Name | Role |
 |---|---|
+| **Eya Hia** | Team Leader · Full-stack development, AI / Machine learning |
+| **Wong Toong Yang** | Full-stack development |
+| **Muhamad Daniel Hakimi** | Backend development, Full-stack development, AI / Machine learning |
+| **Ng Wei Meng** | Data |
+
+---|---|
 | *To be added* | *To be added* |
 | *To be added* | *To be added* |
 | *To be added* | *To be added* |
@@ -379,7 +363,7 @@ npm run typecheck
 - [x] Description
 - [x] Technologies used: Next.js, React, TypeScript, Tailwind CSS, Gemma 4 (Gemini API)
 - [x] AI the project calls: Gemma, Gemini
-- [ ] Live demo / video link
+- [x] Demo video link
 - [x] Prize categories: Best Use of Gemma 4 · Best Open-Source AI Project
 - [x] AI coding tools: Claude Code
 
