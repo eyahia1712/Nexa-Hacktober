@@ -6,14 +6,9 @@ Eleven countries. One door.
 partners across all 11 ASEAN countries that it actually qualifies for, with a
 step-by-step pathway to each one, in 12 languages.**
 
-### ▶️ [Watch the demo video](https://drive.google.com/file/d/1udZzNIyfPSlRVW7VVo-cMQ3Qe0H0N_d3/view?usp=sharing)
+![Nexa: Eleven countries. One door.](docs/screenshots/nexa-hero.png)
 
-[![Watch the Nexa demo video](https://img.shields.io/badge/▶%20Demo%20video-Watch%20now-ffc300?style=for-the-badge&labelColor=111110)](https://drive.google.com/file/d/1udZzNIyfPSlRVW7VVo-cMQ3Qe0H0N_d3/view?usp=sharing)
-[![GitHub repository](https://img.shields.io/badge/GitHub-Nexa--Hacktober-111110?style=for-the-badge&logo=github)](https://github.com/eyahia1712/Nexa-Hacktober)
-
-![Nexa: Eleven countries. One door.](docs/screenshots/nexa-hero.jpg)
-
-![ASEAN has the resources. Founders just can't find them.](docs/screenshots/nexa-problem.jpg)
+![ASEAN has the resources. Founders just can't find them.](docs/screenshots/nexa-problem.png)
 
 *ASEAN has the resources. Founders just can't find them. Nexa is the one door
 to the grants, investors and programmes that fit, across all 11 ASEAN countries.*
@@ -35,9 +30,8 @@ to the grants, investors and programmes that fit, across all 11 ASEAN countries.
 
 | Resource | Link |
 |---|---|
+| 🎬 **Demo Video** | **[Watch the Nexa demo video](https://drive.google.com/file/d/1udZzNIyfPSlRVW7VVo-cMQ3Qe0H0N_d3/view?usp=sharing)** |
 | 💻 **GitHub Repository** | **[github.com/eyahia1712/Nexa-Hacktober](https://github.com/eyahia1712/Nexa-Hacktober)** |
-| 🎬 **Demo Video** | **[Watch the Nexa demo (Google Drive)](https://drive.google.com/file/d/1udZzNIyfPSlRVW7VVo-cMQ3Qe0H0N_d3/view?usp=sharing)** |
-| 🌐 **Live Demo** | *To be added* |
 | 📄 **Sample files to upload** | [TalentLabs company profile (PDF)](public/samples/talentlabs-company-profile.pdf) · [KrackedDevs "what we need" brief (PDF)](public/samples/krackeddevs-what-we-need.pdf) |
 
 ---
