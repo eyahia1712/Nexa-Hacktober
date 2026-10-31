@@ -80,7 +80,7 @@ Every card lists its reasons.
 5. **Organiser**: `/events/new` to host. The host view shows suggested intros (Suggested → Intro sent → Meeting → Deal), the guest list with CSV, and **Find participants**: people on Nexa who aren't registered yet, ranked by fit, with one-click **Invite**. On demo events press *Demo: open the host view*.
 6. **Two people on one laptop**: use a normal window and a private window. Each is a different person.
 
-## Data model (SQLite, `.data/nexa.db`)
+## Data model (SQLite)
 
 ```
 events ──1:N── registrations ──N:1── people ──1:N── notifications
@@ -90,7 +90,10 @@ events ──1:N── registrations ──N:1── people ──1:N── noti
    └──1:N── invites   (host → person, once per event)
 ```
 
-Schema with comments: `lib/db.ts`. Created on first request, demo data added if missing, older databases migrated in place. Delete `.data/` to reset.
+Schema with comments: `lib/db.ts`. Created on first request, demo data added if missing, older databases migrated in place.
+
+- **Local:** `~/.nexa/nexa.db` (outside the project on purpose: inside it, `next dev` sees SQLite's -wal/-shm writes as file changes and reloads the page in a loop). Delete it to reset the demo.
+- **Fly.io:** `/data/nexa.db` on the `nexa_data` volume (see `fly.toml`).
 
 | Route | Method | What |
 | --- | --- | --- |

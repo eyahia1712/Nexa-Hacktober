@@ -1,15 +1,21 @@
 import "server-only";
 import { randomBytes, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
+import { homedir } from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import type { Country, NexaEvent, Person, Registration, Role, Sector, Seniority, Skill, Stage } from "./types";
 
 /**
- * SQLite through Node's built-in node:sqlite (no native install).
- * One file, .data/nexa.db, shared by every browser. Delete it to reset the demo.
+ * SQLite through Node's built-in node:sqlite (no native install). One file, shared by
+ * every browser. Delete it to reset the demo; it is re-created and re-seeded.
+ *
+ * Default: ~/.nexa/nexa.db, outside the project. SQLite touches its -wal/-shm files on
+ * almost every request, and inside the project `next dev` sees those as changes,
+ * rebuilds and reloads the page, which reads the database again: an endless loop.
+ * On Fly.io NEXA_DB points at the volume (/data/nexa.db).
  */
-const FILE = process.env.NEXA_DB || path.join(process.cwd(), ".data", "nexa.db");
+const FILE = process.env.NEXA_DB || path.join(homedir(), ".nexa", "nexa.db");
 const VERSION = 4;
 /** Sample events open their guest list with this key, so the host view can be demoed. */
 export const DEMO_KEY = "demo";
