@@ -182,9 +182,9 @@ function People() {
         photo: "/kd/banner.jpg",
         color: "#050a05",
       },
-      company("padiguard", "PadiGuard", t("who.budi.tag"), t("who.budi.situation"), budi, "ID → MY · VN", <PadiGuardLogo size={68} />, "linear-gradient(160deg,#13995e,#05361f)"),
-      company("kipay", "Kipay", t("who.linh.tag"), t("who.linh.situation"), linh, "VN → TH · PH", <KipayLogo size={68} />, "linear-gradient(160deg,#6366f1,#1e1b4b)"),
-      company("medora", "Medora", t("who.med.tag"), t("who.med.situation"), med, "SG → MY · TH", <MedoraLogo size={68} />, "linear-gradient(160deg,#f43f5e,#4c0519)"),
+      company("padiguard", "PadiGuard", t("who.budi.tag"), t("who.budi.situation"), budi, "ID → MY · VN", <PadiGuardLogo size={60} />, "linear-gradient(160deg,#13995e,#05361f)"),
+      company("kipay", "Kipay", t("who.linh.tag"), t("who.linh.situation"), linh, "VN → TH · PH", <KipayLogo size={60} />, "linear-gradient(160deg,#6366f1,#1e1b4b)"),
+      company("medora", "Medora", t("who.med.tag"), t("who.med.situation"), med, "SG → MY · TH", <MedoraLogo size={60} />, "linear-gradient(160deg,#f43f5e,#4c0519)"),
     ];
   }, [t]);
 

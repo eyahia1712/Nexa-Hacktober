@@ -43,8 +43,8 @@ function ProfileCard({ card, index }: { card: PersonaCard; index: number }) {
         <div aria-hidden className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(rgb(255_255_255/60%)_1px,transparent_1px)] [background-size:16px_16px]" />
           <div className="absolute -top-16 -right-16 size-56 rounded-full bg-white/10" />
-          <div className="absolute top-[17%] right-0 left-0 grid place-items-center">
-            <span className="grid size-[104px] place-items-center rounded-[26px] bg-white shadow-[0_18px_36px_-14px_rgb(0_0_0/55%)]">{card.logo}</span>
+          <div className="absolute top-[13%] right-0 left-0 grid place-items-center">
+            <span className="grid size-[92px] place-items-center rounded-[24px] bg-white shadow-[0_18px_36px_-14px_rgb(0_0_0/55%)]">{card.logo}</span>
           </div>
         </div>
       )}
