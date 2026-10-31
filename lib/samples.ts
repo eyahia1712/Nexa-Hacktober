@@ -63,3 +63,17 @@ export const LINH: { profile: Profile; request: Request } = {
   },
   request: { needs: ["funding", "market-entry"], targetMarkets: ["TH", "PH"] },
 };
+
+export const MEDORA: { profile: Profile; request: Request } = {
+  profile: {
+    id: "sample-medora",
+    name: "Medora",
+    oneLiner: "AI triage and booking for neighbourhood clinics.",
+    country: "SG",
+    sectors: ["healthtech"],
+    stage: "seed",
+    teamSize: 14,
+    source: "sample",
+  },
+  request: { needs: ["funding", "market-entry", "pilot-partner"], targetMarkets: ["MY", "TH"] },
+};
