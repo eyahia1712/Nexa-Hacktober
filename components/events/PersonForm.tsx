@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "../Icon";
-import { post, sectorLabel, store } from "@/lib/client";
+import { post, sectorLabel } from "@/lib/client";
+import { getSession, loadProfile } from "@/lib/store";
 import {
   COUNTRIES,
   COUNTRY_CODES,
@@ -16,7 +17,6 @@ import {
   STAGES,
   type Country,
   type Person,
-  type Profile,
   type Role,
   type Sector,
   type Seniority,
@@ -94,12 +94,21 @@ export function PersonForm({
   const has = (r: Role) => f.roles.includes(r);
   const primary = f.roles[0] ?? allowed[0];
 
+  // Signed in to Nexa with a company profile? Start from that instead of a blank form.
   useEffect(() => {
     if (initial) return;
-    const p = store.get<Profile | null>("nexa.profile", null);
-    if (!p || !allowed.includes("startup")) return;
-    setF((x) => ({ ...x, roles: ["startup"], org: p.name, country: p.country, sector: p.sector, stage: p.stage, note: p.oneLiner }));
-    setFilledFrom("your Nexa profile");
+    const s = getSession();
+    if (!s || s.guest) return;
+    const p = loadProfile(s.email);
+    setF((x) => ({
+      ...x,
+      name: x.name || s.name,
+      email: x.email || s.email,
+      ...(p && allowed.includes("startup")
+        ? { roles: ["startup"], org: p.name, country: p.country, sector: p.sectors[0] ?? "", stage: p.stage, note: p.oneLiner }
+        : {}),
+    }));
+    setFilledFrom(p ? `your Nexa profile (${p.name})` : "your Nexa account");
   }, [initial, allowed]);
 
   // Gemma's draft fills what it found and keeps what the person already typed elsewhere.

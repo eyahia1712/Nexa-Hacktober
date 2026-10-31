@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+
+import { useI18n } from "@/lib/i18n";
 import { COUNTRIES, COUNTRY_CODES } from "@/lib/types";
 
-/** The problem in four boxes. Each draws its picture as it scrolls into view. */
+/** The problem in four boxes. Each draws its picture when it scrolls into view. */
 
 function useInView<T extends Element>() {
   const ref = useRef<T>(null);
@@ -35,90 +37,102 @@ function useCount(target: number, run: boolean, ms = 1200) {
   return v;
 }
 
+/** The same UN SDG colours Nexa used, for a bright, many-coloured grid. */
+const DOTS = ["#E5243B", "#DDA63A", "#4C9F38", "#C5192D", "#FF3A21", "#26BDE2", "#FCC30B", "#A21942", "#FD6925", "#DD1367", "#FD9D24", "#BF8B2E", "#3F7E44", "#0A97D9", "#56C02B", "#00689D", "#19486A", "#111110"];
+
 export function ProblemStats() {
+  const { t } = useI18n();
   const { ref, seen } = useInView<HTMLDivElement>();
   const startups = useCount(11, seen);
   const investors = useCount(5, seen);
-  const countries = useCount(10, seen);
+  const countries = useCount(11, seen);
   const pct = useCount(15, seen);
 
   return (
     <div ref={ref} className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {/* 1 · connections */}
       <Box source="Startup ASEAN / Cradle, 2025 (self-reported)">
-        <p className="font-mono text-[40px] font-semibold leading-none">
-          <span className="text-blue">{startups}k</span>
+        <p className="font-mono text-[40px] leading-none font-semibold">
+          <span className="text-[#2F6BFF]">{startups}k</span>
           <span className="text-[22px] text-ink-3"> + </span>
-          <span className="text-red">{investors}k</span>
+          <span className="text-[#E5243B]">{investors}k</span>
         </p>
-        <p className="mt-3 text-[14px] leading-snug text-ink-2">startups and investors, connected</p>
+        <p className="mt-3 text-[14px] leading-snug text-ink-2">{t("problem.s1")}</p>
         <div className="mt-5 grid grid-cols-12 gap-1" aria-hidden>
-          {Array.from({ length: 48 }, (_, i) => (
+          {Array.from({ length: 60 }, (_, i) => (
             <span
               key={i}
               className="aspect-square rounded-full transition-all duration-500"
               style={{
-                background: seen ? (i % 3 === 2 ? "#d0103a" : "#0033a0") : "#edf1f7",
+                background: seen ? DOTS[(i * 7) % DOTS.length] : "var(--stone)",
                 transform: seen ? "scale(1)" : "scale(0.4)",
                 transitionDelay: `${i * 16}ms`,
               }}
             />
           ))}
         </div>
-        <p className="mt-3 text-[12px] text-ink-3">
-          but <b className="text-ink">which one fits you?</b>
-        </p>
+        <p className="mt-3 text-[12px] text-ink-3">{t("problem.s1b")}</p>
       </Box>
 
-      {/* 2 · fragmentation */}
-      <Box source="ERIA–ATLAS white paper on ASEAN startups">
-        <p className="font-mono text-[40px] font-semibold leading-none">
+      <Box source="ASEAN Secretariat, Oct 2025 · ERIA–ATLAS">
+        <p className="font-mono text-[40px] leading-none font-semibold">
           {countries}
-          <span className="ml-2 text-[16px] font-medium text-ink-3">countries</span>
+          <span className="ml-2 text-[16px] font-medium text-ink-3">{t("problem.s2unit")}</span>
         </p>
-        <p className="mt-3 text-[14px] leading-snug text-ink-2">10 portals, 10 rulebooks, many languages</p>
-        <div className="mt-5 grid grid-cols-5 gap-1.5" aria-hidden>
+        <p className="mt-3 text-[14px] leading-snug text-ink-2">{t("problem.s2")}</p>
+        <div className="mt-5 grid grid-cols-6 gap-1.5" aria-hidden>
           {COUNTRY_CODES.map((c, i) => (
             <span
               key={c}
               title={COUNTRIES[c].name}
-              className="grid aspect-square place-items-center rounded-lg border border-line text-[20px] transition-all duration-500"
+              className="grid aspect-square place-items-center rounded-lg border border-line bg-paper text-[19px] transition-all duration-500"
               style={{ opacity: seen ? 1 : 0, transform: seen ? `rotate(${(i % 3) * 4 - 4}deg)` : "scale(0.6)", transitionDelay: `${i * 60}ms` }}
             >
               {COUNTRIES[c].flag}
             </span>
           ))}
+          <span
+            className="grid aspect-square place-items-center rounded-lg bg-saffron font-mono text-[13px] font-semibold text-saffron-deep transition-all duration-500"
+            style={{ opacity: seen ? 1 : 0, transitionDelay: "700ms" }}
+            title="Nexa: one door"
+          >
+            <svg viewBox="0 0 20 20" className="size-4">
+              <path d="M6 3l8 7-8 7" fill="none" stroke="currentColor" strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
         </div>
       </Box>
 
-      {/* 3 · regional founders */}
       <Box source="Nikkei Asia, via KR-Asia">
-        <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-[40px] font-semibold leading-none text-red">{pct}%</p>
+        <div className="flex items-center gap-4">
           <Ring value={seen ? 0.155 : 0} />
+          <div>
+            <p className="font-mono text-[40px] leading-none font-semibold text-asean-red">{pct}%</p>
+          </div>
         </div>
-        <p className="mt-3 text-[14px] leading-snug text-ink-2">of Singapore&apos;s foreign-born unicorn founders are from elsewhere in ASEAN</p>
-        <p className="mt-3 text-[12px] text-ink-3">The region rarely builds across its own borders.</p>
+        <p className="mt-3 text-[14px] leading-snug text-ink-2">{t("problem.s3")}</p>
+        <p className="mt-3 text-[12px] text-ink-3">{t("problem.s3b")}</p>
       </Box>
 
-      {/* 4 · barriers */}
       <Box source="ERIA–ATLAS white paper on ASEAN startups">
-        <p className="font-mono text-[40px] font-semibold leading-none">4</p>
-        <p className="mt-3 text-[14px] leading-snug text-ink-2">barriers that keep coming back</p>
-        <ul className="mt-5 space-y-2">
-          {[
-            ["Different rules per country", "#d0103a"],
-            ["Hard market entry", "#e9a41c"],
-            ["Partner mismatch", "#0e9f9a"],
-            ["Funding gaps", "#0033a0"],
-          ].map(([t, c], i) => (
-            <li
-              key={t}
-              className="flex items-center gap-2.5 text-[13px] text-ink-2 transition-all duration-500"
-              style={{ opacity: seen ? 1 : 0, transform: seen ? "none" : "translateX(-8px)", transitionDelay: `${i * 120}ms` }}
-            >
-              <span className="h-2.5 w-6 rounded-full" style={{ background: c }} />
-              {t}
+        <p className="font-mono text-[40px] leading-none font-semibold">4</p>
+        <p className="mt-3 text-[14px] leading-snug text-ink-2">{t("problem.s4")}</p>
+        <ul className="mt-5 space-y-2.5">
+          {(
+            [
+              ["problem.b1", "linear-gradient(90deg,#FD9D24,#E5243B)", 92],
+              ["problem.b2", "linear-gradient(90deg,#FCC30B,#FD6925)", 78],
+              ["problem.b3", "linear-gradient(90deg,#56C02B,#3F7E44)", 64],
+              ["problem.b4", "linear-gradient(90deg,#26BDE2,#2F6BFF)", 85],
+            ] as const
+          ).map(([key, bg, w], i) => (
+            <li key={key} className="text-[12.5px] text-ink-2">
+              <span>{t(key)}</span>
+              <span className="mt-1 block h-2 overflow-hidden rounded-full bg-stone">
+                <span
+                  className="block h-full rounded-full transition-[width] duration-1000 ease-out"
+                  style={{ width: seen ? `${w}%` : "0%", background: bg, transitionDelay: `${i * 120}ms` }}
+                />
+              </span>
             </li>
           ))}
         </ul>
@@ -129,7 +143,7 @@ export function ProblemStats() {
 
 function Box({ children, source }: { children: React.ReactNode; source: string }) {
   return (
-    <article className="box box-lift flex flex-col p-6">
+    <article className="nx-card nx-lift flex flex-col p-6 text-ink">
       <div className="flex-1">{children}</div>
       <p className="mt-5 text-[11px] text-ink-3">{source}</p>
     </article>
@@ -141,13 +155,13 @@ function Ring({ value }: { value: number }) {
   const c = 2 * Math.PI * r;
   return (
     <svg viewBox="0 0 80 80" className="size-20 shrink-0 -rotate-90" aria-hidden>
-      <circle cx="40" cy="40" r={r} fill="none" stroke="#edf1f7" strokeWidth="10" />
+      <circle cx="40" cy="40" r={r} fill="none" stroke="var(--stone)" strokeWidth="10" />
       <circle
         cx="40"
         cy="40"
         r={r}
         fill="none"
-        stroke="#d0103a"
+        stroke="var(--asean-red)"
         strokeWidth="10"
         strokeLinecap="round"
         strokeDasharray={c}

@@ -1,3 +1,5 @@
+import { SECTOR_LABEL, type Sector } from "./types";
+
 /** Browser helpers shared by the workspace and the events pages. */
 export const store = {
   get<T>(k: string, fallback: T): T {
@@ -27,7 +29,7 @@ export async function post<T>(url: string, body: unknown, init: RequestInit = {}
   return json as T;
 }
 
-export const sectorLabel = (s: string) => (s === "ai" ? "AI" : s === "saas" ? "SaaS" : s.charAt(0).toUpperCase() + s.slice(1));
+export const sectorLabel = (s: string) => SECTOR_LABEL[s as Sector] ?? s.charAt(0).toUpperCase() + s.slice(1);
 
 /** The signed-in person's device key. No password: whoever holds the key is that person. */
 export const PERSON_KEY = "nexa.person";

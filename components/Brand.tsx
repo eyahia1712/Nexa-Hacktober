@@ -1,31 +1,33 @@
 import Link from "next/link";
 
-/** The door: an open arch in the ASEAN colours, with a gold path leading through. */
-export function Mark({ size = 30 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden className="shrink-0">
-      <rect width="40" height="40" rx="10" fill="#0033a0" />
-      <path d="M9 34 V19 a11 11 0 0 1 22 0 V34 Z" fill="#fff" />
-      <path d="M13.5 34 V19.5 a6.5 6.5 0 0 1 13 0 V34 Z" fill="#d0103a" />
-      <path d="M17 34 L20 24 L23 34 Z" fill="#e9a41c" />
-    </svg>
-  );
-}
+import { cn } from "@/lib/utils";
 
-/** Wordmark: "Nexa" with the emblem standing in for the door it opens. */
-export function Wordmark({ size = 26 }: { size?: number }) {
+/**
+ * The Nexa wordmark: a heavy italic "Nexa" with a saffron chevron riding
+ * ahead of it. The next step, always one move in front.
+ */
+export function NexaLogo({ size = 28, className, inverted = false }: { size?: number; className?: string; inverted?: boolean }) {
   return (
-    <span className="inline-flex items-center gap-[0.28em] font-extrabold italic tracking-[-0.04em] text-ink" style={{ fontSize: size }}>
-      <Mark size={size * 1.05} />
-      Nexa
+    <span
+      className={cn("relative inline-flex items-start leading-none select-none", inverted ? "text-[#f3f3f3]" : "text-ink", className)}
+      style={{ fontSize: size }}
+      role="img"
+      aria-label="Nexa"
+    >
+      <span aria-hidden style={{ fontFamily: "var(--font-logo), var(--font-sans), sans-serif", fontStyle: "italic", fontWeight: 800, letterSpacing: "-0.035em" }}>
+        Nexa
+      </span>
+      <svg aria-hidden viewBox="0 0 20 20" style={{ width: "0.42em", height: "0.42em", marginLeft: "0.06em", marginTop: "-0.02em" }}>
+        <path d="M5 3l9 7-9 7" fill="none" stroke="var(--saffron)" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </span>
   );
 }
 
-export function Logo({ size = 24 }: { size?: number }) {
+export function LogoLink({ size = 26 }: { size?: number }) {
   return (
-    <Link href="/" aria-label="Nexa home" className="rounded-md focus-visible:outline-2 focus-visible:outline-blue">
-      <Wordmark size={size} />
+    <Link href="/" className="nx-focus" aria-label="Nexa home">
+      <NexaLogo size={size} />
     </Link>
   );
 }

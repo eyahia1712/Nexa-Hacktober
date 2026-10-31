@@ -1,122 +1,351 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Nexa ASEAN: a white page and white boxes, in the colours of the ASEAN flag.
-   Blue is for actions. Teal (new) means "strong fit", gold means "partial",
-   red means "not yet". Those three never mean anything else.
+   Nexa · Hacktober edition: warm paper, saffron and ink, with the ASEAN
+   flag's blue and red as accents.
+
+   Saffron is the thing you act on next. Fit colours only ever mean one
+   thing: green = strong fit, amber = partial, red = not eligible.
 --------------------------------------------------------------------------- */
 
 @theme inline {
-  --font-sans: var(--font-jakarta);
-  --font-mono: var(--font-jbmono);
+  --font-sans: var(--font-sans);
+  --font-narrow: var(--font-narrow);
+  --font-mono: var(--font-mono);
 
-  --color-paper: #ffffff;
-  --color-paper-2: #f7f9fc;
-  --color-stone: #edf1f7;
-  --color-line: #e4e8f1;
-  --color-line-strong: #c9d0e0;
-  --color-ink: #12162e;
-  --color-ink-2: #4b5170;
-  --color-ink-3: #8a90aa;
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-stone: var(--stone);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-saffron: var(--saffron);
+  --color-saffron-soft: var(--saffron-soft);
+  --color-saffron-deep: var(--saffron-deep);
+  --color-night: var(--night);
 
-  --color-blue: #0033a0;
-  --color-blue-2: #2f5bd3;
-  --color-blue-soft: #e9effc;
-  --color-red: #d0103a;
-  --color-red-soft: #fdedf0;
-  --color-gold: #e9a41c;
-  --color-gold-deep: #a86f00;
-  --color-gold-soft: #fdf5e3;
-  --color-teal: #0e9f9a;
-  --color-teal-deep: #087571;
-  --color-teal-soft: #e3f5f4;
-  --color-sky: #d9ecfa;
+  --color-asean: var(--asean);
+  --color-asean-soft: var(--asean-soft);
+  --color-asean-red: var(--asean-red);
+
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
 }
 
-html {
-  background: #ffffff;
-  color: var(--color-ink);
+:root {
+  --paper: #faf9f5;
+  --paper-2: #f2f0e9;
+  --stone: #eae8e1;
+  --card: #ffffff;
+  --line: #dcd9d0;
+  --line-strong: #b9b5aa;
+  --ink: #111110;
+  --ink-2: #5c5a54;
+  --ink-3: #8a877e;
+
+  --saffron: #ffc300;
+  --saffron-soft: #fff3c4;
+  --saffron-deep: #3d2e00;
+  --night: #0b1b28;
+
+  /* ASEAN flag. */
+  --asean: #0033a0;
+  --asean-soft: #e8eefb;
+  --asean-red: #d0103a;
+
+  --good: #0e7a4b;
+  --warn: #b07400;
+  --bad: #ce2c2c;
 }
-body {
-  background: #ffffff;
-  -webkit-font-smoothing: antialiased;
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+  html {
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  ::selection {
+    background: var(--asean);
+    color: #fff;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
 }
-::selection {
-  background: var(--color-blue);
-  color: #fff;
+
+/* Uppercase micro-labels: eyebrows, chips, buttons. */
+.nx-micro {
+  font-family: var(--font-narrow), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+}
+:lang(zh) .nx-micro,
+:lang(ta) .nx-micro,
+:lang(th) .nx-micro,
+:lang(km) .nx-micro,
+:lang(lo) .nx-micro,
+:lang(my) .nx-micro {
+  letter-spacing: 0.2px;
+  line-height: 1.5;
+}
+
+.nx-focus:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.nx-dotgrid {
+  background-image: radial-gradient(rgb(0 0 0 / 7%) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* The one card: white, soft border, long soft shadow. Every box uses it. */
+.nx-card {
+  border-radius: 1rem;
+  border: 1px solid rgb(185 181 170 / 60%);
+  background: var(--card);
+  box-shadow: 0 14px 34px -24px rgb(0 0 0 / 45%);
+}
+.nx-lift {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nx-lift:hover {
+  transform: translateY(-4px);
+}
+
+@keyframes nx-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-rise {
+  animation: nx-rise 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+@keyframes nx-ticker {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.nx-ticker {
+  animation: nx-ticker 50s linear infinite;
+}
+.nx-ticker-wrap:hover .nx-ticker {
+  animation-play-state: paused;
+}
+
+@keyframes nx-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.nx-grow {
+  transform-origin: left center;
+  animation: nx-grow 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes nx-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.nx-live {
+  animation: nx-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes nx-bar {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+.nx-loading {
+  animation: nx-bar 1.3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-rise,
+  .nx-ticker,
+  .nx-grow,
+  .nx-live,
+  .nx-loading {
+    animation: none;
+  }
+  .nx-lift:hover {
+    transform: none;
+  }
+}
+
+/* Footer ground: paper dissolving into night. */
+.nx-footer-ground {
+  background:
+    linear-gradient(180deg, var(--paper) 0%, rgb(250 249 245 / 62%) 26%, rgb(250 249 245 / 0%) 100%),
+    linear-gradient(180deg, #0b1b28 0%, #04122b 46%, #020c1c 100%);
+  background-size:
+    100% 110px,
+    auto;
+  background-repeat: no-repeat;
+}
+
+/* ---------------------------------------------------------------------------
+   Events, people and talent pages: their colour and class names, mapped onto
+   the Nexa tokens above, so those pages share this look.
+   Startups = ASEAN blue · investors = green · talent = saffron.
+--------------------------------------------------------------------------- */
+@theme inline {
+  --color-blue: var(--asean);
+  --color-blue-soft: var(--asean-soft);
+  --color-red: var(--asean-red);
+  --color-red-soft: #fbe8ec;
+  --color-teal: var(--good);
+  --color-teal-deep: var(--good);
+  --color-teal-soft: #e2f1e9;
+  --color-gold: var(--saffron);
+  --color-gold-deep: var(--saffron-deep);
+  --color-gold-soft: var(--saffron-soft);
 }
 
 @layer components {
-/* The one box: every card in the product is this card. */
-.box {
-  border-radius: 1rem;
-  border: 1px solid rgb(201 208 224 / 0.6);
-  background: #fff;
-  box-shadow: 0 14px 34px -24px rgb(0 0 0 / 0.45);
+  .box {
+    border-radius: 1rem;
+    border: 1px solid rgb(185 181 170 / 60%);
+    background: var(--card);
+    box-shadow: 0 14px 34px -24px rgb(0 0 0 / 45%);
+  }
+  .box-lift {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .box-lift:hover {
+    transform: translateY(-4px);
+  }
+  .micro {
+    font-family: var(--font-narrow), ui-sans-serif, system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+  }
+  .btn {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.375rem;
+    padding: 0 1.1rem;
+    font-family: var(--font-narrow), ui-sans-serif, system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  /* The main action is saffron, as everywhere in Nexa. */
+  .btn-blue {
+    background: var(--saffron);
+    color: var(--saffron-deep);
+  }
+  .btn-blue:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+  .btn-line {
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+  }
+  .btn-line:hover {
+    border-color: var(--line-strong);
+    background: var(--paper-2);
+  }
 }
-.box-lift {
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-.box-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 22px 40px -26px rgb(0 33 120 / 0.5);
+.rise {
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-
-.micro {
-  font-size: 11.5px;
-  font-weight: 600;
-  line-height: 16px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-
-.btn {
-  display: inline-flex;
-  min-height: 2.75rem;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border-radius: 0.6rem;
-  padding: 0 1.25rem;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+.dot {
+  animation: pulse-dot 1.2s ease-in-out infinite;
 }
-.btn:active { transform: scale(0.98); }
-.btn-blue { background: var(--color-blue); color: #fff; }
-.btn-blue:hover { background: #00247a; }
-.btn-line { border: 1px solid var(--color-ink); color: var(--color-ink); }
-.btn-line:hover { background: var(--color-ink); color: #fff; }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
 }
-
-/* ── motion ─────────────────────────────────────────── */
-@keyframes drift { 0%,100% { transform: translateX(0); } 50% { transform: translateX(14px); } }
-.drift { animation: drift 16s ease-in-out infinite; }
-.drift-slow { animation: drift 24s ease-in-out infinite reverse; }
-
-@keyframes dash { to { stroke-dashoffset: -24; } }
-.dash { animation: dash 1.2s linear infinite; }
-
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
-.blink { animation: blink 1.4s ease-in-out infinite; }
-
-@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-.rise { animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
-
-@keyframes pop { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-.pop { animation: pop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; transform-box: fill-box; transform-origin: center; }
-
-@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
-.bob { animation: bob 3s ease-in-out infinite; }
-
-@keyframes pulse-dot { 0%,100% { opacity: 0.25; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
-.dot { animation: pulse-dot 1.2s ease-in-out infinite; }
-
-@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.marquee { animation: marquee 45s linear infinite; }
-
+.blink {
+  animation: blink 1.4s ease-in-out infinite;
+}
 @media (prefers-reduced-motion: reduce) {
-  .drift, .drift-slow, .dash, .blink, .rise, .pop, .bob, .dot, .marquee { animation: none !important; }
-  .box-lift:hover { transform: none; }
+  .rise,
+  .dot,
+  .blink {
+    animation: none;
+  }
+  .box-lift:hover {
+    transform: none;
+  }
 }

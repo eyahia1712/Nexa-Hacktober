@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Logo } from "../Brand";
+import { LogoLink } from "../Brand";
+import { LanguageMenu } from "../ui";
 import { Icon } from "../Icon";
 import { NotificationBell } from "../NotificationBell";
 import { ROLE_LABEL, type NexaEvent, type Role } from "@/lib/types";
@@ -34,14 +35,15 @@ export function EventsHeader({ action = true }: { action?: boolean }) {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-white/90 backdrop-blur">
       <div className={`${SHELL} flex items-center gap-4 py-3`}>
-        <Logo />
+        <LogoLink size={24} />
         <nav className="flex items-center gap-1">
           <Link href="/events" className="micro px-2 py-2 text-ink-2 transition-colors hover:text-ink">Events</Link>
-          <Link href="/app" className="micro hidden px-2 py-2 text-ink-2 transition-colors hover:text-ink sm:block">Opportunities</Link>
+          <Link href="/dashboard" className="micro hidden px-2 py-2 text-ink-2 transition-colors hover:text-ink sm:block">Opportunities</Link>
           <Link href="/me" className="micro px-2 py-2 text-ink-2 transition-colors hover:text-ink">Me</Link>
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <NotificationBell />
+          <LanguageMenu compact />
           {action && (
             <Link href="/events/new" className="btn btn-blue min-h-9 px-3 text-[13px]">
               <Icon name="plus" size={15} /> <span className="hidden sm:inline">Create event</span>
