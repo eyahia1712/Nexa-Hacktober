@@ -278,5 +278,6 @@
  "need.drop": "将 PDF, PowerPoint 或 Word 文件拖放到此处",
  "start.sampleDeck": "使用 TalentLabs 示例",
  "start.samplePdf": "没有文件？下载示例：TalentLabs 公司简介 (PDF)",
- "need.samplePdf": "下载 KD 的简介 (PDF) 以进行上传测试"
+ "need.samplePdf": "下载 KD 的简介 (PDF) 以进行上传测试",
+ "tab.events": "活动"
 }

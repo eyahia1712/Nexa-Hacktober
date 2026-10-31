@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Icon } from "../Icon";
-import { getJson, personHeaders, sectorLabel, store } from "@/lib/client";
+import { ensurePerson, getJson, personKey, sectorLabel, store } from "@/lib/client";
 import { COUNTRIES, ROLE_LABEL, ROLE_PLURAL, ROLES, type Country, type EventRec, type EventSummary, type Role } from "@/lib/types";
 import { DateTile, EventsHeader, HOSTING_KEY, ROLE_TEXT, ROLE_TONE, SHELL, fmtDay, fmtTime, isLive, isPast } from "./ui";
 
@@ -21,7 +21,9 @@ export function EventList() {
     getJson<{ events: EventSummary[] }>("/api/events")
       .then((j) => setEvents(j.events))
       .catch(() => setError("Couldn't load events."));
-    if (personHeaders()["x-person-key"]) getJson<{ recommended: EventRec[] }>("/api/me").then((r) => setPicked(r.recommended.slice(0, 3))).catch(() => {});
+    ensurePerson().then(() => {
+      if (personKey()) getJson<{ recommended: EventRec[] }>("/api/me").then((r) => setPicked(r.recommended.slice(0, 3))).catch(() => {});
+    });
   }, []);
 
   const shown = (events ?? []).filter(

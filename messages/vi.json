@@ -278,5 +278,6 @@
  "need.drop": "Thả tệp PDF, PowerPoint hoặc Word vào đây",
  "start.sampleDeck": "Sử dụng mẫu của TalentLabs",
  "start.samplePdf": "Chưa có file? Tải mẫu tại đây: Hồ sơ công ty TalentLabs (PDF)",
- "need.samplePdf": "Tải bản tóm tắt của KD (PDF) để dùng thử tính năng tải lên"
+ "need.samplePdf": "Tải bản tóm tắt của KD (PDF) để dùng thử tính năng tải lên",
+ "tab.events": "Sự kiện"
 }

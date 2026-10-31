@@ -8,7 +8,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Icon, type IconName } from "@/components/Icon";
 import { BTN_SAFFRON, INPUT, Micro } from "@/components/ui";
 import { useI18n } from "@/lib/i18n";
-import { createAccount, getSession, guestSession, loadProfile, signIn } from "@/lib/store";
+import { createAccount, getSession, guestSession, loadProfile, sampleSession, signIn } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 type Path = "upload" | "form" | "signin";
@@ -142,6 +142,25 @@ export default function LoginPage() {
               </article>
             );
           })}
+        </div>
+
+        {/* Investors aren't companies looking for help: their sample goes to events, where they meet startups. */}
+        <div className="nx-card nx-rise mt-4 flex flex-wrap items-center gap-4 p-4 md:p-5">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-good font-mono text-[13px] text-white">CF</span>
+          <div className="min-w-[14rem] flex-1">
+            <p className="text-[16px] font-medium">Investor? Try the Cradle Fund sample</p>
+            <p className="text-[13.5px] text-ink-2">An investor profile built by Gemma from cradle.com.my. See the startups and talent at today&apos;s events.</p>
+          </div>
+          <button
+            onClick={() => {
+              sampleSession("sample-cradle", "Cradle Fund");
+              router.push("/me");
+            }}
+            className={cn(BTN_SAFFRON, "min-h-10")}
+          >
+            Open the investor sample
+            <Icon name="arrow" size={15} />
+          </button>
         </div>
 
         {path ? (

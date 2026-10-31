@@ -278,5 +278,6 @@
  "need.drop": "วางไฟล์ PDF, PowerPoint หรือ Word ที่นี่",
  "start.sampleDeck": "ใช้ตัวอย่างจาก TalentLabs",
  "start.samplePdf": "ยังไม่มีไฟล์? ดาวน์โหลดตัวอย่าง: โปรไฟล์บริษัท TalentLabs (PDF)",
- "need.samplePdf": "ดาวน์โหลดสรุปข้อมูลของ KD (PDF) เพื่อทดลองอัปโหลด"
+ "need.samplePdf": "ดาวน์โหลดสรุปข้อมูลของ KD (PDF) เพื่อทดลองอัปโหลด",
+ "tab.events": "อีเวนต์"
 }

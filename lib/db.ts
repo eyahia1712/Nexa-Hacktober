@@ -371,7 +371,24 @@ function seed(d: DatabaseSync) {
     putri: person({ role: "talent", name: "Putri Ayu", org: "Freelance", country: "ID", skills: ["design", "product"], seniority: "mid", sectors: ["agritech", "edtech", "healthtech"], note: "Product designer, mobile-first. Part-time or contract." }),
     hafiz: person({ role: "talent", name: "Hafiz Rahman", org: "Universiti Malaya", country: "MY", skills: ["growth", "sales"], seniority: "junior", sectors: [], note: "Final-year student, ran growth for a campus marketplace. Any sector." }),
     maianh: person({ role: "talent", name: "Le Mai Anh", org: "Tiki", country: "VN", skills: ["product", "operations"], seniority: "senior", sectors: ["fintech", "ecommerce"], note: "PM, 6 years in e-commerce payments. Looking for my next 0→1." }),
+    // The two sample accounts on /login act as these people (see SAMPLE_KEYS in lib/client.ts).
+    // KrackedDevs: from lib/samples.ts KD_PROFILE (first sector, stage, one-liner).
+    kd: person({ role: "startup", name: "KrackedDevs (sample)", org: "KrackedDevs", country: "MY", sector: "edtech", stage: "seed", hiring: ["engineering", "growth"], note: "Malaysia's builder ecosystem: a community, a school and a product lab, run by builders." }),
+    // Cradle Fund: drafted by Gemma autofill from cradle.com.my (roles, org, country, stages, note).
+    // The site lists no sectors, so the broad tech list and the CIP ticket are ours.
+    cradle: person({
+      role: "vc",
+      name: "Cradle Fund (sample)",
+      org: "Cradle Fund",
+      country: "MY",
+      sectors: ["ai", "fintech", "agritech", "healthtech", "edtech", "devtools", "saas", "climate"],
+      stages: ["pre-seed", "seed"],
+      ticket: "Grants up to RM 150k (CIP)",
+      note: "A government-mandated agency that empowers early-stage technology startups through grants, investments, and ecosystem initiatives.",
+    }),
   };
+  /** Fixed device keys for the sample accounts, like DEMO_KEY for the demo host view. */
+  const FIXED_KEYS: Partial<Record<keyof typeof P, string>> = { kd: "demo-kd", cradle: "demo-cradle" };
 
   const reg = (eventId: string, p: Person) =>
     d.prepare("INSERT OR IGNORE INTO registrations (id, event_id, person_id, created_at) VALUES (?, ?, ?, ?)").run(randomUUID(), eventId, p.id, at);
@@ -384,13 +401,15 @@ function seed(d: DatabaseSync) {
       else d.prepare("UPDATE events SET audience = ? WHERE id = ? AND sample = 1").run(JSON.stringify(e.audience), e.id);
     }
     // Demo people are matched by email, so a database made before them keeps its ids.
-    for (const p of Object.values(P)) {
+    for (const [name, p] of Object.entries(P) as [keyof typeof P, Person][]) {
+      const fixed = FIXED_KEYS[name];
       const found = d.prepare("SELECT id FROM people WHERE email = ?").get(p.email) as Row | undefined;
       if (!found) {
-        insertPerson(d, p, newKey());
+        insertPerson(d, p, fixed ?? newKey());
         continue;
       }
       p.id = found.id as string;
+      if (fixed) d.prepare("UPDATE people SET device_key = ? WHERE id = ?").run(fixed, p.id);
       if (p.hiring) d.prepare("UPDATE people SET hiring = ? WHERE id = ? AND hiring IS NULL").run(JSON.stringify(p.hiring), p.id);
     }
     // Arif, Pim, Jose and Maria aren't registered for the KL night: the organiser can find and invite them.
@@ -398,7 +417,8 @@ function seed(d: DatabaseSync) {
     for (const p of [P.dewi, P.kevin, P.budi, P.arif]) reg("agritech-pilot-day-jakarta", p);
     for (const p of [P.somchai, P.maria, P.linh]) reg("fintech-vc-office-hours", p);
     // Today's live demo: a mixed room of investors, startups and hackers.
-    for (const p of [P.aisha, P.kevin, P.dewi, P.maria, P.budi, P.arif, P.siti, P.jose, P.pim, P.farah, P.weijie, P.putri, P.hafiz]) reg("hack-day-kl-2026", p);
+    for (const p of [P.aisha, P.kevin, P.dewi, P.maria, P.budi, P.arif, P.siti, P.jose, P.pim, P.farah, P.weijie, P.putri, P.hafiz, P.cradle]) reg("hack-day-kl-2026", p);
+    // KrackedDevs isn't registered anywhere: signing in as KD shows which events to pick.
     // Mai Anh isn't registered anywhere yet: organisers can find and invite her.
     // One outcome already logged, so the host funnel isn't empty in the demo.
     const regId = (eventId: string, p: Person) =>

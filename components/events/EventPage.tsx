@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Icon } from "../Icon";
-import { getJson, PERSON_KEY, personHeaders, post, sectorLabel, store } from "@/lib/client";
+import { ensurePerson, getJson, personHeaders, post, sectorLabel, setPersonKey, store } from "@/lib/client";
 import type { Intro } from "@/lib/eventMatch";
 import {
   COUNTRIES,
@@ -37,6 +37,7 @@ export function EventPage({ id }: { id: string }) {
 
   const load = useCallback(
     async (k: string | null) => {
+      await ensurePerson();
       const res = await fetch(`/api/events/${id}`, { headers: { ...personHeaders(), ...(k ? { "x-host-key": k } : {}) } });
       if (res.status === 404) return setMissing(true);
       const j = (await res.json()) as { event: EventSummary; host: HostData | null; me: Me | null };
@@ -289,7 +290,7 @@ function RegisterCard({ event }: { event: EventSummary }) {
           setError("");
           try {
             const r = await post<{ personKey: string }>(`/api/events/${event.id}/register`, v);
-            store.set(PERSON_KEY, r.personKey);
+            setPersonKey(r.personKey);
             // Reload so the header bell and every page know who you are now.
             window.location.reload();
           } catch (e) {

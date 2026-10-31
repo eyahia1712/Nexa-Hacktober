@@ -3,6 +3,7 @@ import { LogoLink } from "../Brand";
 import { LanguageMenu } from "../ui";
 import { Icon } from "../Icon";
 import { NotificationBell } from "../NotificationBell";
+import { WhoAmI } from "./WhoAmI";
 import { ROLE_LABEL, type NexaEvent, type Role } from "@/lib/types";
 
 export const SHELL = "mx-auto w-full max-w-[1120px] px-4 sm:px-6";
@@ -44,6 +45,7 @@ export function EventsHeader({ action = true }: { action?: boolean }) {
         <div className="ml-auto flex items-center gap-2">
           <NotificationBell />
           <LanguageMenu compact />
+          <WhoAmI />
           {action && (
             <Link href="/events/new" className="btn btn-blue min-h-9 px-3 text-[13px]">
               <Icon name="plus" size={15} /> <span className="hidden sm:inline">Create event</span>

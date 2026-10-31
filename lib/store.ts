@@ -66,6 +66,13 @@ export function guestSession(): Session {
   return session;
 }
 
+/** A sample account that is not a company (the Cradle investor): signed in under its own name. */
+export function sampleSession(email: string, name: string): Session {
+  const session = { email, name };
+  write("nexa-session", session);
+  return session;
+}
+
 export const getSession = () => read<Session | null>("nexa-session", null);
 export const signOut = () => write("nexa-session", null);
 

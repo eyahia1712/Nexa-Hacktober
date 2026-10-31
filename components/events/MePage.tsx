@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Icon } from "../Icon";
-import { getJson, PERSON_KEY, personHeaders, post, store } from "@/lib/client";
+import { ensurePerson, getJson, personHeaders, personKey, post, setPersonKey } from "@/lib/client";
+import { getSession } from "@/lib/store";
 import { COUNTRIES, ROLE_LABEL, ROLE_PLURAL, ROLES, type EventRec, type EventSummary, type Notice, type Person } from "@/lib/types";
 import { focus } from "./EventPage";
 import { PersonForm } from "./PersonForm";
@@ -21,8 +22,9 @@ export function MePage() {
   const [error, setError] = useState("");
   const [leaving, setLeaving] = useState(false);
 
-  const load = useCallback(() => {
-    if (!personHeaders()["x-person-key"]) return setState("new");
+  const load = useCallback(async () => {
+    await ensurePerson();
+    if (!personKey()) return setState("new");
     getJson<MeData>("/api/me")
       .then((d) => {
         setData(d);
@@ -31,15 +33,20 @@ export function MePage() {
       .catch(() => setState("new"));
     getJson<{ items: Notice[] }>("/api/me/notifications").then((r) => setNotes(r.items)).catch(() => {});
   }, []);
-  useEffect(load, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
+  // Signed in (or a sample): the account decides who you are, so there is nothing to switch here.
+  const [anonymous, setAnonymous] = useState(false);
+  useEffect(() => setAnonymous(!getSession()), []);
 
   const save = async (v: unknown) => {
     setBusy(true);
     setError("");
     try {
       const r = await post<{ key: string }>("/api/me", v, { headers: personHeaders() });
-      const isNew = !personHeaders()["x-person-key"];
-      store.set(PERSON_KEY, r.key);
+      const isNew = !personKey();
+      setPersonKey(r.key);
       if (isNew) return window.location.reload();
       setEditing(false);
       load();
@@ -96,13 +103,13 @@ export function MePage() {
                     <button onClick={() => setEditing(true)} className="btn btn-line mt-4 min-h-9 w-full text-[13px]">
                       <Icon name="edit" size={15} /> Edit profile
                     </button>
-                    {leaving ? (
+                    {!anonymous ? null : leaving ? (
                       <div className="mt-3 rounded-xl bg-red-soft p-3 text-[12.5px] text-red">
                         This browser will forget you. There&apos;s no password, so you can&apos;t sign back in to this profile.
                         <div className="mt-2 flex gap-2">
                           <button
                             onClick={() => {
-                              store.set(PERSON_KEY, null);
+                              setPersonKey(null);
                               window.location.reload();
                             }}
                             className="btn min-h-8 bg-red px-3 text-[12px] text-white"

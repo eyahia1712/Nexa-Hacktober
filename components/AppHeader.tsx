@@ -8,6 +8,7 @@ import Link from "next/link";
 import { LogoLink } from "@/components/Brand";
 import { NotificationBell } from "@/components/NotificationBell";
 import { LanguageMenu } from "@/components/ui";
+import { currentName } from "@/lib/client";
 import { useI18n } from "@/lib/i18n";
 import { getSession, signOut, type Session } from "@/lib/store";
 import { initials } from "@/lib/utils";
@@ -16,7 +17,12 @@ export function AppHeader({ children }: { children?: ReactNode }) {
   const { t } = useI18n();
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
-  useEffect(() => setSession(getSession()), []);
+  // A guest exploring a company (the KrackedDevs sample, or an upload) shows as that company.
+  const [name, setName] = useState<string | null>(null);
+  useEffect(() => {
+    setSession(getSession());
+    setName(currentName());
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
@@ -24,19 +30,24 @@ export function AppHeader({ children }: { children?: ReactNode }) {
         <LogoLink size={24} />
         {children}
         <div className="ml-auto flex items-center gap-2">
-          <Link href="/events" className="nx-micro nx-focus inline-flex min-h-9 items-center px-2 text-ink-2 hover:text-ink">
-            Events
-          </Link>
-          <Link href="/me" className="nx-micro nx-focus inline-flex min-h-9 items-center px-2 text-ink-2 hover:text-ink">
-            Me
-          </Link>
+          {/* Signed in, events live in the dashboard's 06 Events tab instead. */}
+          {session ? null : (
+            <>
+              <Link href="/events" className="nx-micro nx-focus inline-flex min-h-9 items-center px-2 text-ink-2 hover:text-ink">
+                Events
+              </Link>
+              <Link href="/me" className="nx-micro nx-focus inline-flex min-h-9 items-center px-2 text-ink-2 hover:text-ink">
+                Me
+              </Link>
+            </>
+          )}
           <NotificationBell />
           <LanguageMenu />
           {session ? (
             <>
               <span className="hidden items-center gap-2 rounded-md border border-line bg-card py-1 pr-3 pl-1 text-[13.5px] sm:inline-flex">
-                <span className="grid size-7 place-items-center rounded bg-asean font-mono text-[11px] text-white">{session.guest ? "G" : initials(session.name)}</span>
-                <span className="max-w-[8rem] truncate">{session.guest ? t("top.guest") : session.name}</span>
+                <span className="grid size-7 place-items-center rounded bg-asean font-mono text-[11px] text-white">{name ? initials(name) : "G"}</span>
+                <span className="max-w-[8rem] truncate">{name ?? t("top.guest")}</span>
               </span>
               <button
                 onClick={() => {

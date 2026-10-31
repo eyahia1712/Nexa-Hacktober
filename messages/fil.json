@@ -278,5 +278,6 @@
  "need.drop": "I-drop ang PDF, PowerPoint, o Word file dito",
  "start.sampleDeck": "Gamitin ang sample ng TalentLabs",
  "start.samplePdf": "Walang file? Mag-download ng sample: TalentLabs company profile (PDF)",
- "need.samplePdf": "Mag-download ng brief ng KD (PDF) para subukan ang upload"
+ "need.samplePdf": "Mag-download ng brief ng KD (PDF) para subukan ang upload",
+ "tab.events": "Mga event"
 }

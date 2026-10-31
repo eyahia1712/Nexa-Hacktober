@@ -278,5 +278,6 @@
  "need.drop": "ວາງໄຟລ໌ PDF, PowerPoint ຫຼື Word ໄວ້ບ່ອນນີ້",
  "start.sampleDeck": "ໃຊ້ຕົວຢ່າງຈາກ TalentLabs",
  "start.samplePdf": "ບໍ່ມີໄຟລ໌ບໍ? ດາວໂຫຼດຕົວຢ່າງ: ຂໍ້ມູນບໍລິສັດ TalentLabs (PDF)",
- "need.samplePdf": "ດາວໂຫຼດບົດສະຫຼຸບຂອງ KD (PDF) ເພື່ອທົດລອງອັບໂຫຼດ"
+ "need.samplePdf": "ດາວໂຫຼດບົດສະຫຼຸບຂອງ KD (PDF) ເພື່ອທົດລອງອັບໂຫຼດ",
+ "tab.events": "ງານອີເວັນ"
 }

@@ -278,5 +278,6 @@
  "need.drop": "Letakkan file PDF, PowerPoint atau Word di sini",
  "start.sampleDeck": "Gunakan sampel TalentLabs",
  "start.samplePdf": "Belum ada file? Unduh sampel: profil perusahaan TalentLabs (PDF)",
- "need.samplePdf": "Unduh ringkasan KD (PDF) untuk mencoba unggahan"
+ "need.samplePdf": "Unduh ringkasan KD (PDF) untuk mencoba unggahan",
+ "tab.events": "Acara"
 }

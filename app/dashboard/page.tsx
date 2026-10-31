@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { AppHeader } from "@/components/AppHeader";
+import { DashboardEvents } from "@/components/events/DashboardEvents";
 import { CompanyCard } from "@/components/CompanyCard";
 import { Icon } from "@/components/Icon";
 import { BTN_GHOST, BTN_INK, BTN_SAFFRON, Flag, INPUT, Loading, Micro, Modal, ScoreRing, VERDICT_COLOR } from "@/components/ui";
@@ -36,6 +37,7 @@ const TABS = [
   { id: "pathway", key: "tab.pathway" },
   { id: "tracker", key: "tab.tracker" },
   { id: "ask", key: "tab.ask" },
+  { id: "events", key: "tab.events" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -159,6 +161,7 @@ export default function Dashboard() {
               ) : null}
               {tab === "tracker" ? <Tracker matches={matches} tracker={tracker} onTrack={track} onPath={openPath} /> : null}
               {tab === "ask" && request ? <Ask profile={profile} request={request} matches={matches} /> : null}
+              {tab === "events" ? <DashboardEvents company={profile.name} /> : null}
             </div>
               </>
             )}

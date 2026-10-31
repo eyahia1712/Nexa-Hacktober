@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Icon } from "./Icon";
-import { getJson, personHeaders, post } from "@/lib/client";
+import { ensurePerson, getJson, personHeaders, personKey, post } from "@/lib/client";
 import type { Notice } from "@/lib/types";
 
 const TONE: Record<Notice["type"], string> = { interest: "bg-blue-soft text-blue", match: "bg-teal-soft text-teal-deep", invite: "bg-gold-soft text-gold-deep" };
@@ -18,7 +18,7 @@ export function NotificationBell() {
   const box = useRef<HTMLDivElement>(null);
 
   const load = useCallback(() => {
-    if (!personHeaders()["x-person-key"]) return;
+    if (!personKey()) return;
     getJson<{ items: Notice[]; unread: number }>("/api/me/notifications")
       .then((r) => {
         setItems(r.items);
@@ -28,8 +28,10 @@ export function NotificationBell() {
   }, []);
 
   useEffect(() => {
-    setSignedIn(!!personHeaders()["x-person-key"]);
-    load();
+    ensurePerson().then(() => {
+      setSignedIn(!!personKey());
+      load();
+    });
     const t = setInterval(load, 15_000);
     const close = (e: MouseEvent) => box.current && !box.current.contains(e.target as Node) && setOpen(false);
     document.addEventListener("mousedown", close);
