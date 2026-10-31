@@ -198,8 +198,8 @@ function UploadBox({ onDone }: { onDone: (p: Profile, r: Request | null) => void
   };
 
   const sampleDeck = async () => {
-    const blob = await (await fetch("/sample-deck.pdf")).blob();
-    await upload(new File([blob], "padiguard-deck.pdf", { type: "application/pdf" }));
+    const blob = await (await fetch("/samples/talentlabs-company-profile.pdf")).blob();
+    await upload(new File([blob], "talentlabs-company-profile.pdf", { type: "application/pdf" }));
   };
 
   return (
@@ -251,6 +251,10 @@ function UploadBox({ onDone }: { onDone: (p: Profile, r: Request | null) => void
             }}
           />
           {error ? <p className="mt-4 text-[13px] text-bad">{error}</p> : null}
+          <a href="/samples/talentlabs-company-profile.pdf" download className="mt-5 inline-flex items-center gap-1.5 text-[13px] text-asean underline-offset-4 hover:underline">
+            <Icon name="doc" size={14} />
+            {t("start.samplePdf")}
+          </a>
         </div>
 
         <div className="nx-card p-5">
