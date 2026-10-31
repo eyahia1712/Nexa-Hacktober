@@ -8,11 +8,12 @@ import { BTN_OUTLINE, BTN_SAFFRON, LanguageMenu } from "@/components/ui";
 import { useI18n } from "@/lib/i18n";
 import { matchAll } from "@/lib/match";
 import { OPPORTUNITIES } from "@/lib/opportunities";
-import { BUDI, KD_PROFILE, KD_REQUEST, LINH } from "@/lib/samples";
-import { getSession } from "@/lib/store";
+import { BUDI, KD_PROFILE, KD_REQUEST, LINH, MEDORA } from "@/lib/samples";
+import { getSession, loadProfile } from "@/lib/store";
 import { COUNTRIES, COUNTRY_CODES } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import { KipayLogo, MedoraLogo, PadiGuardLogo } from "./CompanyLogos";
 import { HowItWorks } from "./HowItWorks";
 import { PersonaCards, type PersonaCard } from "./PersonaCards";
 import { ProblemStats } from "./ProblemStats";
@@ -25,7 +26,9 @@ export const REPO = "https://github.com/eyahia1712/Nexa-Hacktober";
 function useCtaHref() {
   const [href, setHref] = useState("/login");
   useEffect(() => {
-    if (getSession()) setHref("/dashboard");
+    // Only a signed-in company with a profile skips the start options.
+    const s = getSession();
+    if (s && !s.guest && loadProfile(s.email)) setHref("/dashboard");
   }, []);
   return href;
 }
@@ -96,7 +99,6 @@ function Hero() {
             {t("hero.sample")}
           </Link>
         </div>
-        <p className="mt-5 font-mono text-[12.5px] text-ink-3">{t("hero.stat", { n: OPPORTUNITIES.length })}</p>
       </div>
       <CountryTicker />
     </section>
@@ -141,7 +143,7 @@ function Problem() {
     <section id="problem" className="scroll-mt-20 border-b border-line bg-paper-2 py-16 md:py-24">
       <div className={SHELL}>
         <p className="nx-micro text-ink-3">{t("problem.eyebrow")}</p>
-        <h2 className={H2}>{t("problem.title")}</h2>
+        <h2 className="mt-3 max-w-2xl text-[clamp(1.5rem,2.6vw,2rem)] leading-tight font-medium tracking-[-0.02em]">{t("problem.title")}</h2>
         <ProblemStats />
       </div>
     </section>
@@ -155,7 +157,19 @@ function People() {
     const kd = matchAll(KD_PROFILE, KD_REQUEST, OPPORTUNITIES);
     const budi = matchAll(BUDI.profile, BUDI.request, OPPORTUNITIES);
     const linh = matchAll(LINH.profile, LINH.request, OPPORTUNITIES);
+    const med = matchAll(MEDORA.profile, MEDORA.request, OPPORTUNITIES);
     const strong = (m: typeof kd) => m.filter((x) => x.verdict === "strong").length;
+    const company = (id: string, name: string, tag: string, situation: string, m: typeof kd, route: string, logo: React.ReactNode, color: string): PersonaCard => ({
+      id,
+      name,
+      tag,
+      situation,
+      answer: m[0]!.opp.name,
+      chips: [t("who.strong", { n: strong(m) }), route],
+      score: { value: String(m[0]!.score), label: t("who.match") },
+      logo,
+      color,
+    });
     return [
       {
         id: "kd",
@@ -168,39 +182,9 @@ function People() {
         photo: "/kd/banner.jpg",
         color: "#050a05",
       },
-      {
-        id: "budi",
-        name: "PadiGuard",
-        tag: t("who.budi.tag"),
-        situation: t("who.budi.situation"),
-        answer: budi[0]!.opp.name,
-        chips: [t("who.strong", { n: strong(budi) }), "🇮🇩 → 🇲🇾 🇻🇳"],
-        score: { value: String(budi[0]!.score), label: t("who.match") },
-        flags: "🇮🇩",
-        color: "linear-gradient(160deg,#d0103a,#7a0820)",
-      },
-      {
-        id: "linh",
-        name: "Kipay",
-        tag: t("who.linh.tag"),
-        situation: t("who.linh.situation"),
-        answer: linh[0]!.opp.name,
-        chips: [t("who.strong", { n: strong(linh) }), "🇻🇳 → 🇹🇭 🇵🇭"],
-        score: { value: String(linh[0]!.score), label: t("who.match") },
-        flags: "🇻🇳",
-        color: "linear-gradient(160deg,#0e7a4b,#06402a)",
-      },
-      {
-        id: "asean",
-        name: t("who.sa.name"),
-        tag: t("who.sa.tag"),
-        situation: t("who.sa.situation"),
-        answer: t("who.sa.answer"),
-        chips: [t("who.tracker"), t("who.languages")],
-        score: { value: "11", label: t("who.countries") },
-        flags: "🇧🇳 🇰🇭 🇮🇩 🇱🇦\n🇲🇾 🇲🇲 🇵🇭 🇸🇬\n🇹🇭 🇹🇱 🇻🇳",
-        color: "linear-gradient(160deg,#0033a0,#001a55)",
-      },
+      company("padiguard", "PadiGuard", t("who.budi.tag"), t("who.budi.situation"), budi, "ID → MY · VN", <PadiGuardLogo size={68} />, "linear-gradient(160deg,#13995e,#05361f)"),
+      company("kipay", "Kipay", t("who.linh.tag"), t("who.linh.situation"), linh, "VN → TH · PH", <KipayLogo size={68} />, "linear-gradient(160deg,#6366f1,#1e1b4b)"),
+      company("medora", "Medora", t("who.med.tag"), t("who.med.situation"), med, "SG → MY · TH", <MedoraLogo size={68} />, "linear-gradient(160deg,#f43f5e,#4c0519)"),
     ];
   }, [t]);
 
@@ -231,32 +215,35 @@ function How() {
 }
 
 const SOURCES = [
-  { name: "Startup ASEAN × Cradle", key: "src.1", by: "Startup ASEAN · 2025 (self-reported)" },
-  { name: "ASEAN Secretariat", key: "src.2", by: "47th ASEAN Summit, Kuala Lumpur · Oct 2025" },
-  { name: "ERIA–ATLAS white paper", key: "src.3", by: "ERIA · ASEAN startup ecosystems" },
-  { name: "Nikkei Asia", key: "src.4", by: "via KR-Asia · unicorn founder origins" },
-  { name: "Gemma 4", key: "src.5", by: "Google · open weights · via the Gemini API" },
-  { name: "krackeddevs.com", key: "src.6", by: "KrackedDevs · read 31 Oct 2026" },
+  { name: "Startup ASEAN", key: "src.1", url: "https://startup-asean.org" },
+  { name: "ASEAN Secretariat", key: "src.2", url: "https://asean.org" },
+  { name: "ERIA", key: "src.3", url: "https://www.eria.org" },
+  { name: "Nikkei Asia", key: "src.4", url: "https://asia.nikkei.com" },
+  { name: "Gemma 4", key: "src.5", url: "https://ai.google.dev/gemma" },
+  { name: "KrackedDevs", key: "src.6", url: "https://krackeddevs.com" },
 ] as const;
 
 function Evidence() {
   const { t } = useI18n();
   return (
-    <section id="evidence" className="scroll-mt-20 py-16 md:py-24">
+    <section id="evidence" className="scroll-mt-20 py-16 md:py-20">
       <div className={SHELL}>
         <p className="nx-micro text-ink-3">{t("evidence.eyebrow")}</p>
-        <h2 className={H2}>{t("evidence.title")}</h2>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SOURCES.map((s, i) => (
-            <article key={s.name} className="nx-card nx-lift p-5">
-              <span className="block h-1 w-10 rounded-full" style={{ background: ["#0033a0", "#d0103a", "#ffc300", "#0e7a4b", "#0033a0", "#22d41b"][i] }} />
-              <p className="mt-4 text-[16px] font-medium">{s.name}</p>
-              <p className="mt-2 text-[14px] leading-snug text-ink-2">{t(s.key)}</p>
-              <p className="mt-3 text-[11.5px] text-ink-3">{s.by}</p>
-            </article>
+        <h2 className="mt-3 max-w-3xl text-[clamp(1.5rem,2.6vw,2rem)] leading-tight font-medium tracking-[-0.02em]">{t("evidence.title")}</h2>
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {SOURCES.map((s) => (
+            <a key={s.name} href={s.url} target="_blank" rel="noreferrer" className="nx-card nx-lift nx-focus group flex flex-col p-4">
+              <p className="text-[15px] font-medium">{s.name}</p>
+              <p className="mt-1 flex-1 text-[13px] text-ink-2">{t(s.key)}</p>
+              <p className="mt-3 inline-flex items-center gap-1.5 truncate font-mono text-[11.5px] text-asean group-hover:underline">
+                {s.url.replace(/^https?:\/\/(www\.)?/, "")}
+                <svg viewBox="0 0 16 16" className="size-3 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+                  <path d="M6 3h7v7M13 3 5 11" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </p>
+            </a>
           ))}
         </div>
-        <p className="mt-6 max-w-3xl rounded-xl border border-line bg-paper-2 p-4 text-[13.5px] leading-relaxed text-ink-2">{t("evidence.note")}</p>
       </div>
     </section>
   );
