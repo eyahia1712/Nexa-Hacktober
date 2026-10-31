@@ -6,6 +6,11 @@ Eleven countries. One door.
 partners across all 11 ASEAN countries that it actually qualifies for, with a
 step-by-step pathway to each one, in 12 languages.**
 
+### ▶️ [Watch the demo video](https://drive.google.com/file/d/1udZzNIyfPSlRVW7VVo-cMQ3Qe0H0N_d3/view?usp=sharing)
+
+[![Watch the Nexa demo video](https://img.shields.io/badge/▶%20Demo%20video-Watch%20now-ffc300?style=for-the-badge&labelColor=111110)](https://drive.google.com/file/d/1udZzNIyfPSlRVW7VVo-cMQ3Qe0H0N_d3/view?usp=sharing)
+[![GitHub repository](https://img.shields.io/badge/GitHub-Nexa--Hacktober-111110?style=for-the-badge&logo=github)](https://github.com/eyahia1712/Nexa-Hacktober)
+
 ![Nexa: Eleven countries. One door.](docs/screenshots/nexa-hero.jpg)
 
 *One door for every founder: the grants, investors and programmes that fit,
