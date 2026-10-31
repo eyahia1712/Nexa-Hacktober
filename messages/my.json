@@ -114,7 +114,6 @@
  "start.reading": "Gemma 4 ဖတ်နေသည်...",
  "start.formats": "PDF, PowerPoint (.pptx), Word (.docx), ပုံ သို့မဟုတ် .txt · အများဆုံး 8 MB",
  "start.choose": "ဖိုင်ရွေးချယ်ရန်",
- "start.sampleDeck": "နမူနာ deck ကို အသုံးပြုမည်",
  "start.orType": "သို့မဟုတ် သင့်ကုမ္ပဏီအကြောင်း စာကြောင်းအနည်းငယ်ဖြင့် ဖော်ပြပါ",
  "start.typePh": "ကျွန်ုပ်တို့သည် Jakarta အခြေစိုက် အဖွဲ့ဝင် ၅ ဦးပါဝင်သော agritech startup တစ်ခုဖြစ်သည်။ Pre-seed အဆင့်ဖြစ်သည်။ ကျွန်ုပ်တို့သည် စပါးစိုက်တောင်သူများကို ကူညီပေးသည်...",
  "start.readText": "Gemma 4 ဖြင့် ဖတ်ရှုမည်",
@@ -276,5 +275,8 @@
  "need.uploadS": "Pitch deck၊ ရန်ပုံငွေအစီအစဉ် သို့မဟုတ် အကျဉ်းချုပ်။ Gemma 4 က ဖတ်ရှုပြီး သင့်အတွက် အခွင့်အလမ်းများကို ရှာဖွေပေးပါလိမ့်မည်။",
  "need.kdPitch": "KD ရဲ့ နမူနာ pitch ကို အသုံးပြုမည်",
  "need.or": "သို့မဟုတ် ကိုယ်တိုင်ရွေးချယ်ပါ",
- "need.drop": "PDF, PowerPoint သို့မဟုတ် Word ဖိုင်ကို ဤနေရာသို့ ဆွဲထည့်ပါ"
+ "need.drop": "PDF, PowerPoint သို့မဟုတ် Word ဖိုင်ကို ဤနေရာသို့ ဆွဲထည့်ပါ",
+ "start.sampleDeck": "TalentLabs နမူနာကို အသုံးပြုရန်",
+ "start.samplePdf": "ဖိုင်မရှိဘူးလား? နမူနာဒေါင်းလုဒ်ဆွဲရန်: TalentLabs company profile (PDF)",
+ "need.samplePdf": "စမ်းသပ်ကြည့်ရန် KD's brief (PDF) ကို ဒေါင်းလုဒ်ဆွဲပါ"
 }

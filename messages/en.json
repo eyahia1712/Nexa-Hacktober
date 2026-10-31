@@ -127,7 +127,7 @@
   "start.reading": "Gemma 4 is reading it…",
   "start.formats": "PDF, PowerPoint (.pptx), Word (.docx), image or .txt · up to 8 MB",
   "start.choose": "Choose a file",
-  "start.sampleDeck": "Use a sample deck",
+  "start.sampleDeck": "Use the TalentLabs sample",
   "start.orType": "Or describe your company in a few lines",
   "start.typePh": "We're a 5-person agritech startup in Jakarta. Pre-seed. We help rice farmers…",
   "start.readText": "Read with Gemma 4",
@@ -276,5 +276,7 @@
   "need.uploadS": "A pitch deck, funding plan or short brief. Gemma 4 reads it and finds your opportunities.",
   "need.kdPitch": "Use KD's sample pitch",
   "need.or": "Or choose it yourself",
-  "need.drop": "Drop a PDF, PowerPoint or Word file here"
+  "need.drop": "Drop a PDF, PowerPoint or Word file here",
+  "start.samplePdf": "No file? Download a sample: TalentLabs company profile (PDF)",
+  "need.samplePdf": "Download KD's brief (PDF) to try the upload"
 }

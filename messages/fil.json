@@ -114,7 +114,6 @@
  "start.reading": "Binabasa ito ng Gemma 4…",
  "start.formats": "PDF, PowerPoint (.pptx), Word (.docx), image o .txt · hanggang 8 MB",
  "start.choose": "Pumili ng file",
- "start.sampleDeck": "Gumamit ng sample deck",
  "start.orType": "O ilarawan ang iyong kumpanya sa ilang linya",
  "start.typePh": "Kami ay isang 5-person agritech startup sa Jakarta. Pre-seed. Tinutulungan namin ang mga magsasaka ng palay…",
  "start.readText": "Basahin gamit ang Gemma 4",
@@ -276,5 +275,8 @@
  "need.uploadS": "Isang pitch deck, funding plan, o maikling brief. Babasahin ito ng Gemma 4 at hahanapin ang iyong mga oportunidad.",
  "need.kdPitch": "Gamitin ang sample pitch ng KD",
  "need.or": "O piliin ito nang mag-isa",
- "need.drop": "I-drop ang PDF, PowerPoint, o Word file dito"
+ "need.drop": "I-drop ang PDF, PowerPoint, o Word file dito",
+ "start.sampleDeck": "Gamitin ang sample ng TalentLabs",
+ "start.samplePdf": "Walang file? Mag-download ng sample: TalentLabs company profile (PDF)",
+ "need.samplePdf": "Mag-download ng brief ng KD (PDF) para subukan ang upload"
 }

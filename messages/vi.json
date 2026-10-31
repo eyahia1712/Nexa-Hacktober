@@ -114,7 +114,6 @@
  "start.reading": "Gemma 4 đang đọc…",
  "start.formats": "PDF, PowerPoint (.pptx), Word (.docx), hình ảnh hoặc .txt · tối đa 8 MB",
  "start.choose": "Chọn tệp",
- "start.sampleDeck": "Sử dụng deck mẫu",
  "start.orType": "Hoặc mô tả công ty của bạn trong vài dòng",
  "start.typePh": "Chúng tôi là startup agritech 5 người tại Jakarta. Giai đoạn Pre-seed. Chúng tôi giúp nông dân trồng lúa…",
  "start.readText": "Đọc bằng Gemma 4",
@@ -276,5 +275,8 @@
  "need.uploadS": "Một bản pitch deck, kế hoạch gọi vốn hoặc bản tóm tắt ngắn. Gemma 4 sẽ đọc và tìm kiếm cơ hội cho bạn.",
  "need.kdPitch": "Sử dụng bản pitch mẫu của KD",
  "need.or": "Hoặc tự chọn",
- "need.drop": "Thả tệp PDF, PowerPoint hoặc Word vào đây"
+ "need.drop": "Thả tệp PDF, PowerPoint hoặc Word vào đây",
+ "start.sampleDeck": "Sử dụng mẫu của TalentLabs",
+ "start.samplePdf": "Chưa có file? Tải mẫu tại đây: Hồ sơ công ty TalentLabs (PDF)",
+ "need.samplePdf": "Tải bản tóm tắt của KD (PDF) để dùng thử tính năng tải lên"
 }
