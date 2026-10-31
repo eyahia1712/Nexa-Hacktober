@@ -1,3 +1,4 @@
+/** All 11 ASEAN member states. Timor-Leste joined as the 11th in October 2025. */
 export const COUNTRIES = {
   MY: { name: "Malaysia", flag: "🇲🇾" },
   SG: { name: "Singapore", flag: "🇸🇬" },
@@ -9,6 +10,7 @@ export const COUNTRIES = {
   KH: { name: "Cambodia", flag: "🇰🇭" },
   LA: { name: "Laos", flag: "🇱🇦" },
   MM: { name: "Myanmar", flag: "🇲🇲" },
+  TL: { name: "Timor-Leste", flag: "🇹🇱" },
 } as const;
 
 export type Country = keyof typeof COUNTRIES;
@@ -24,28 +26,36 @@ export const STAGE_LABEL: Record<Stage, string> = {
 };
 
 export const SECTORS = [
+  "ai",
   "agritech",
   "fintech",
   "healthtech",
   "edtech",
+  "devtools",
   "climate",
   "logistics",
   "ecommerce",
-  "ai",
   "foodtech",
   "mobility",
   "saas",
 ] as const;
 export type Sector = (typeof SECTORS)[number];
+export const SECTOR_LABEL: Record<Sector, string> = {
+  ai: "AI",
+  agritech: "Agritech",
+  fintech: "Fintech",
+  healthtech: "Healthtech",
+  edtech: "Edtech",
+  devtools: "Dev tools",
+  climate: "Climate",
+  logistics: "Logistics",
+  ecommerce: "E-commerce",
+  foodtech: "Foodtech",
+  mobility: "Mobility",
+  saas: "SaaS",
+};
 
-export const NEEDS = [
-  "funding",
-  "mentorship",
-  "pilot-partner",
-  "market-entry",
-  "talent",
-  "cloud-credits",
-] as const;
+export const NEEDS = ["funding", "mentorship", "pilot-partner", "market-entry", "talent", "cloud-credits"] as const;
 export type Need = (typeof NEEDS)[number];
 export const NEED_LABEL: Record<Need, string> = {
   funding: "Funding",
@@ -57,6 +67,7 @@ export const NEED_LABEL: Record<Need, string> = {
 };
 
 export type OppType = "grant" | "investor" | "accelerator" | "partner" | "talent" | "programme";
+export const OPP_TYPES: OppType[] = ["grant", "investor", "accelerator", "partner", "talent", "programme"];
 export const TYPE_LABEL: Record<OppType, string> = {
   grant: "Grant",
   investor: "Investor",
@@ -82,24 +93,39 @@ export type Opportunity = {
   deadline: string;
   url: string;
   summary: string;
-  /** Added by the user from a poster or link. */
-  imported?: boolean;
 };
 
+/** The company. Built once from a sample, an upload or a form. */
 export type Profile = {
+  id: string;
   name: string;
   oneLiner: string;
+  about?: string;
   country: Country;
-  sector: Sector;
+  sectors: Sector[];
   stage: Stage;
   teamSize: number;
+  website?: string;
+  /** Data URL or public path. */
+  logo?: string;
+  /** Wide picture for the top of the profile card. */
+  banner?: string;
+  /** Brand colour for accents on the card. */
+  accent?: string;
+  /** Up to four headline numbers, such as "3,744 builders". */
+  highlights?: { value: string; label: string }[];
+  source: "sample" | "upload" | "form";
+};
+
+/** What the company is looking for right now. */
+export type Request = {
   needs: Need[];
   targetMarkets: Country[];
   ask?: string;
-  traction?: string;
+  notes?: string;
 };
 
-export type Reason = { tone: "good" | "warn" | "bad"; text: string };
+export type Reason = { tone: "good" | "warn" | "bad"; key: string; vars?: Record<string, string | number> };
 
 export type Match = {
   opp: Opportunity;
@@ -109,10 +135,8 @@ export type Match = {
   daysLeft: number | null;
 };
 
+export type PathStep = { title: string; detail: string; when: string };
+export type Pathway = { steps: PathStep[]; documents: string[]; tip: string; mode: "gemma" | "rules" };
+
 export type TrackStage = "saved" | "applied" | "meeting" | "deal";
-export const TRACK_STAGES: { id: TrackStage; label: string }[] = [
-  { id: "saved", label: "Saved" },
-  { id: "applied", label: "Applied" },
-  { id: "meeting", label: "Meeting" },
-  { id: "deal", label: "Deal" },
-];
+export const TRACK_STAGES: TrackStage[] = ["saved", "applied", "meeting", "deal"];
