@@ -15,7 +15,8 @@ import type { Country, NexaEvent, Person, Registration, Role, Sector, Seniority,
  * rebuilds and reloads the page, which reads the database again: an endless loop.
  * On Fly.io NEXA_DB points at the volume (/data/nexa.db).
  */
-const FILE = process.env.NEXA_DB || path.join(homedir(), ".nexa", "nexa.db");
+// On Vercel only /tmp is writable: the demo database lives there and is re-seeded on a cold start.
+const FILE = process.env.NEXA_DB || (process.env.VERCEL ? "/tmp/nexa.db" : path.join(homedir(), ".nexa", "nexa.db"));
 const VERSION = 4;
 /** Sample events open their guest list with this key, so the host view can be demoed. */
 export const DEMO_KEY = "demo";
