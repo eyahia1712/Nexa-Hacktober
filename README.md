@@ -137,6 +137,7 @@ the ones that fit them.
 - **Ask Nexa**: multilingual answers grounded only in the company's matches
 - **12-language interface**: a dropdown at the top of every page
 - **Accounts**: create an account or sign in; judges can open the sample with no account
+- **Events** (06 Events tab, `/events`, `/me`): register, see who is at the event ranked by fit, mutual interest unlocks an intro, hosts track intros to deals
 
 ![Three ways to start: sample profile, upload documents, or create it manually](docs/screenshots/start-options.jpg)
 
@@ -176,12 +177,51 @@ strong fits, the best score, deadlines and countries with a match.*
 | AI | **Gemma 4** (`gemma-4-26b-a4b-it`) through the Gemini API | Open-weight, multimodal: reads PDFs and images directly |
 | File reading | `fflate` for PowerPoint and Word text, in memory | Nothing uploaded is stored |
 | Data | Typed opportunity dataset (33 entries, 11 countries) | Real organisation names; illustrative amounts and dates |
-| Storage | Browser localStorage | Demo accounts, profiles and tracker stay on the device |
+| Storage | Browser localStorage · SQLite (`node:sqlite`) | Profiles and tracker on the device; events and people shared |
 | Translation | Gemma 4 at build time (`scripts/translate.mjs`) | 12 languages, only missing keys are re-translated |
-| Hosting / Dev | Vercel · GitHub | Zero-setup deployment |
+| Hosting / Dev | Fly.io (Docker, `fly.toml`) · Vercel · GitHub | Fly keeps the SQLite file on a volume |
 
 **Sources:** Startup ASEAN / Cradle, ASEAN Secretariat, ERIA, Nikkei Asia,
 krackeddevs.com and talentlabs.org. Every source is linked on the landing page.
+
+### 🎟️ Events, people and talent
+
+**Live demo event:** *Hacktoberfest Hack Day Kuala Lumpur* (Sat 31 Oct 2026, DOJO KL) is seeded with founders and investors, so its dashboard has people in it.
+
+1. **Become a person**: open `/me` and create your profile as a startup or an investor, or just register for any event. No password: the browser keeps a device key.
+2. **Find the right event**: `/events` and `/me` show *Picked for you*, ranked by your role, sector, country and who useful is already registered.
+3. **Register**: one click once you have a profile. Founders who built a Nexa profile from their deck get the form prefilled.
+4. **Event dashboard** (`/events/[id]/live`): only the people at that event, ranked by fit to you, with reasons. Press **Interested**; they get a 🔔 notification. Both sides interested = a **match**, emails unlock, and a founder–investor match is logged as an intro for the host.
+5. **Organiser**: `/events/new` to host. The host view shows suggested intros (Suggested → Intro sent → Meeting → Deal), the guest list with CSV, and **Find participants**: people on Nexa who aren't registered yet, ranked by fit, with one-click **Invite**. On demo events press *Demo: open the host view*.
+6. **Two people on one laptop**: use a normal window and a private window. Each is a different person.
+
+### 🗄️ Events data model (SQLite)
+
+```
+events ──1:N── registrations ──N:1── people ──1:N── notifications
+   │                │                  │
+   │                └── intros (startup reg ↔ vc reg, host funnel)
+   ├──1:N── interests (from person → to person, per event; both ways = match)
+   └──1:N── invites   (host → person, once per event)
+```
+
+Schema with comments: `lib/db.ts`. Created on first request, demo data added if missing, older databases migrated in place.
+
+- **Local:** `~/.nexa/nexa.db` (outside the project on purpose: inside it, `next dev` sees SQLite's -wal/-shm writes as file changes and reloads the page in a loop). Delete it to reset the demo.
+- **Fly.io:** `/data/nexa.db` on the `nexa_data` volume (see `fly.toml`).
+
+| Route | Method | What |
+| --- | --- | --- |
+| `/api/events` | GET / POST | List (with `going` for `x-person-key`) / create (returns `hostKey`) |
+| `/api/events/[id]` | GET | Details; `x-host-key` adds guests + intros, `x-person-key` adds `me` |
+| `/api/events/[id]/register` | POST | Register; newcomers send a profile and get `personKey` back |
+| `/api/events/[id]/participants` | GET | Event dashboard: other guests ranked by fit (guests only) |
+| `/api/events/[id]/interest` | POST | `{ toId }`: notify them; mutual = match |
+| `/api/events/[id]/intros` | PATCH | Host moves an intro along |
+| `/api/events/[id]/candidates` | GET | Host: people not registered yet, ranked by fit |
+| `/api/events/[id]/invite` | POST | Host: `{ personId }`, sends an invite notification |
+| `/api/me` | GET / POST | Your profile, events, picks / create or edit profile |
+| `/api/me/notifications` | GET / POST | List / mark all read |
 
 ---
 
@@ -190,7 +230,8 @@ krackeddevs.com and talentlabs.org. Every source is linked on the landing page.
 ```
 .
 ├── app/                      # Pages: / · /login · /start · /dashboard
-│   └── api/                  # profile · need · pathway · ask · draft
+│   ├── events/ · me/         # Events, event dashboard, personal profile
+│   └── api/                  # profile · need · pathway · ask · draft · events · me · autofill
 ├── components/
 │   ├── landing/              # Hero, problem, who it's for, how it works
 │   ├── CompanyCard.tsx       # The profile card on the left
@@ -204,6 +245,11 @@ krackeddevs.com and talentlabs.org. Every source is linked on the landing page.
 │   ├── logo.ts               # Company logo from its website
 │   ├── i18n.tsx              # Language provider for 12 languages
 │   ├── samples.ts            # KrackedDevs and landing-page samples
+│   ├── db.ts                 # SQLite (node:sqlite) for events, people and intros
+│   ├── events.ts · people.ts # Event and people logic
+│   ├── eventMatch.ts         # Ranks people at an event by fit
+│   ├── autofill.ts           # Gemma 4 fills forms from a website
+│   ├── safeFetch.ts          # Fetches only public addresses
 │   └── store.ts              # Browser accounts, profiles and tracker
 ├── messages/                 # en.json plus 11 Gemma-translated languages
 ├── public/

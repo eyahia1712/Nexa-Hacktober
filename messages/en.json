@@ -278,5 +278,6 @@
   "need.or": "Or choose it yourself",
   "need.drop": "Drop a PDF, PowerPoint or Word file here",
   "start.samplePdf": "No file? Download a sample: TalentLabs company profile (PDF)",
-  "need.samplePdf": "Download KD's brief (PDF) to try the upload"
+  "need.samplePdf": "Download KD's brief (PDF) to try the upload",
+  "tab.events": "Events"
 }

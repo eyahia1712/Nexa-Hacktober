@@ -278,5 +278,6 @@
  "need.drop": "Letakkan fail PDF, PowerPoint atau Word di sini",
  "start.sampleDeck": "Gunakan sampel TalentLabs",
  "start.samplePdf": "Tiada fail? Muat turun sampel: profil syarikat TalentLabs (PDF)",
- "need.samplePdf": "Muat turun ringkasan KD (PDF) untuk mencuba fungsi muat naik"
+ "need.samplePdf": "Muat turun ringkasan KD (PDF) untuk mencuba fungsi muat naik",
+ "tab.events": "Acara"
 }

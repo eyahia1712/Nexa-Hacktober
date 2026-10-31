@@ -218,3 +218,134 @@
     auto;
   background-repeat: no-repeat;
 }
+
+/* ---------------------------------------------------------------------------
+   Events, people and talent pages: their colour and class names, mapped onto
+   the Nexa tokens above, so those pages share this look.
+   Startups = ASEAN blue · investors = green · talent = saffron.
+--------------------------------------------------------------------------- */
+@theme inline {
+  --color-blue: var(--asean);
+  --color-blue-soft: var(--asean-soft);
+  --color-red: var(--asean-red);
+  --color-red-soft: #fbe8ec;
+  --color-teal: var(--good);
+  --color-teal-deep: var(--good);
+  --color-teal-soft: #e2f1e9;
+  --color-gold: var(--saffron);
+  --color-gold-deep: var(--saffron-deep);
+  --color-gold-soft: var(--saffron-soft);
+}
+
+@layer components {
+  .box {
+    border-radius: 1rem;
+    border: 1px solid rgb(185 181 170 / 60%);
+    background: var(--card);
+    box-shadow: 0 14px 34px -24px rgb(0 0 0 / 45%);
+  }
+  .box-lift {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .box-lift:hover {
+    transform: translateY(-4px);
+  }
+  .micro {
+    font-family: var(--font-narrow), ui-sans-serif, system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+  }
+  .btn {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.375rem;
+    padding: 0 1.1rem;
+    font-family: var(--font-narrow), ui-sans-serif, system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  /* The main action is saffron, as everywhere in Nexa. */
+  .btn-blue {
+    background: var(--saffron);
+    color: var(--saffron-deep);
+  }
+  .btn-blue:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+  .btn-line {
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+  }
+  .btn-line:hover {
+    border-color: var(--line-strong);
+    background: var(--paper-2);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.dot {
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+.blink {
+  animation: blink 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .dot,
+  .blink {
+    animation: none;
+  }
+  .box-lift:hover {
+    transform: none;
+  }
+}

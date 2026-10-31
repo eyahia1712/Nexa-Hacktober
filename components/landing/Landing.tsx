@@ -71,6 +71,9 @@ function Nav() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
+          <Link href="/events" className="nx-micro nx-focus inline-flex min-h-9 items-center px-3 text-ink-2 transition-colors hover:text-ink">
+            Events
+          </Link>
           <LanguageMenu />
           <Link href={href} className={cn(BTN_SAFFRON, "hidden min-h-9 sm:inline-flex")}>
             {t("nav.cta")}
