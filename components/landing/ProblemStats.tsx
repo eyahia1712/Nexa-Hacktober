@@ -37,8 +37,8 @@ function useCount(target: number, run: boolean, ms = 1200) {
   return v;
 }
 
-/** ASEAN blue, red, yellow, plus the fit green: the only four colours on the page. */
-const DOTS = ["#0033a0", "#0033a0", "#d0103a", "#ffc300", "#0033a0", "#0e7a4b"];
+/** The same UN SDG colours Nexa used, for a bright, many-coloured grid. */
+const DOTS = ["#E5243B", "#DDA63A", "#4C9F38", "#C5192D", "#FF3A21", "#26BDE2", "#FCC30B", "#A21942", "#FD6925", "#DD1367", "#FD9D24", "#BF8B2E", "#3F7E44", "#0A97D9", "#56C02B", "#00689D", "#19486A", "#111110"];
 
 export function ProblemStats() {
   const { t } = useI18n();
@@ -52,9 +52,9 @@ export function ProblemStats() {
     <div ref={ref} className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <Box source="Startup ASEAN / Cradle, 2025 (self-reported)">
         <p className="font-mono text-[40px] leading-none font-semibold">
-          <span className="text-asean">{startups}k</span>
+          <span className="text-[#2F6BFF]">{startups}k</span>
           <span className="text-[22px] text-ink-3"> + </span>
-          <span className="text-asean-red">{investors}k</span>
+          <span className="text-[#E5243B]">{investors}k</span>
         </p>
         <p className="mt-3 text-[14px] leading-snug text-ink-2">{t("problem.s1")}</p>
         <div className="mt-5 grid grid-cols-12 gap-1" aria-hidden>
@@ -119,10 +119,10 @@ export function ProblemStats() {
         <ul className="mt-5 space-y-2.5">
           {(
             [
-              ["problem.b1", "linear-gradient(90deg,#ff6b81,#d0103a)", 92],
-              ["problem.b2", "linear-gradient(90deg,#ffd84d,#ffc300)", 78],
-              ["problem.b3", "linear-gradient(90deg,#4fbf8a,#0e7a4b)", 64],
-              ["problem.b4", "linear-gradient(90deg,#5b86e5,#0033a0)", 85],
+              ["problem.b1", "linear-gradient(90deg,#FD9D24,#E5243B)", 92],
+              ["problem.b2", "linear-gradient(90deg,#FCC30B,#FD6925)", 78],
+              ["problem.b3", "linear-gradient(90deg,#56C02B,#3F7E44)", 64],
+              ["problem.b4", "linear-gradient(90deg,#26BDE2,#2F6BFF)", 85],
             ] as const
           ).map(([key, bg, w], i) => (
             <li key={key} className="text-[12.5px] text-ink-2">
