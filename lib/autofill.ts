@@ -1,8 +1,7 @@
 import "server-only";
-import { lookup } from "node:dns/promises";
-import { isIP } from "node:net";
 import { gemma, hasKey, parseJson, type FilePart } from "./gemma";
 import { oneOf, someOf, str } from "./people";
+import { safeFetch } from "./safeFetch";
 import { COUNTRY_CODES, ROLES, SECTORS, SENIORITY, SKILLS, STAGES, type Country, type Role, type Sector, type Seniority, type Skill, type Stage } from "./types";
 
 /** What Gemma found. Empty fields are left out so they don't wipe what the person typed. */
@@ -112,12 +111,15 @@ function clean(raw: Record<string, unknown>, source: string): Draft {
 }
 
 // ── reading a web page safely ────────────────────────────────
-const MAX_BYTES = 3_000_000;
+const FAILED = {
+  "bad-url": "Only plain http and https links work.",
+  private: "That address isn't a public website.",
+  network: "Couldn't open that link. Check it, or upload a PDF instead.",
+  "too-big": "That page is too big to read.",
+  redirects: "Too many redirects.",
+} as const;
 
-/**
- * Fetches a public web page for Gemma. Only http(s), only public addresses (checked on
- * every redirect), 8 s and 3 MB at most, so a pasted link can't reach the server's own network.
- */
+/** A public web page (or PDF) for Gemma. safeFetch keeps a pasted link off the server's own network. */
 async function readPage(input: string): Promise<{ url: string; host: string; text: string; pdf?: string } | { error: string }> {
   let url: URL;
   try {
@@ -127,84 +129,13 @@ async function readPage(input: string): Promise<{ url: string; host: string; tex
   }
   if (/(^|\.)linkedin\.com$/i.test(url.hostname)) return { error: "LinkedIn blocks automated reading. Save your profile as PDF and upload it." };
 
-  for (let hop = 0; hop < 4; hop++) {
-    if (url.protocol !== "https:" && url.protocol !== "http:") return { error: "Only http and https links work." };
-    if (url.username || url.password) return { error: "Links with a username or password aren't allowed." };
-    if (!(await isPublicHost(url.hostname))) return { error: "That address isn't a public website." };
-    let res: Response;
-    try {
-      res = await fetch(url, {
-        redirect: "manual",
-        signal: AbortSignal.timeout(8000),
-        headers: { "User-Agent": "NexaBot/0.1 (+profile autofill)", Accept: "text/html,application/pdf;q=0.9,*/*;q=0.5" },
-      });
-    } catch {
-      return { error: "Couldn't open that link. Check it, or upload a PDF instead." };
-    }
-    if (res.status >= 300 && res.status < 400 && res.headers.get("location")) {
-      url = new URL(res.headers.get("location")!, url);
-      continue;
-    }
-    if (!res.ok) return { error: `That site answered ${res.status}. Try another page or a PDF.` };
-    const type = res.headers.get("content-type") ?? "";
-    const body = await readCapped(res);
-    if (!body) return { error: "That page is too big to read." };
-    if (type.includes("application/pdf")) return { url: url.href, host: url.hostname, text: "", pdf: Buffer.from(body).toString("base64") };
-    if (!type.includes("html") && !type.startsWith("text/")) return { error: "That link isn't a web page or a PDF." };
-    const text = htmlToText(new TextDecoder().decode(body));
-    if (text.length < 80) return { error: "That page has almost no text (it may need JavaScript). Try a PDF." };
-    return { url: url.href, host: url.hostname.replace(/^www\./, ""), text };
-  }
-  return { error: "Too many redirects." };
-}
-
-async function readCapped(res: Response): Promise<Uint8Array | null> {
-  const reader = res.body?.getReader();
-  if (!reader) return new Uint8Array();
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.length;
-    if (size > MAX_BYTES) {
-      await reader.cancel();
-      return null;
-    }
-    chunks.push(value);
-  }
-  const out = new Uint8Array(size);
-  let at = 0;
-  for (const c of chunks) {
-    out.set(c, at);
-    at += c.length;
-  }
-  return out;
-}
-
-async function isPublicHost(host: string): Promise<boolean> {
-  const h = host.replace(/^\[|\]$/g, "");
-  if (/^localhost$|\.localhost$|\.local$|\.internal$/i.test(h)) return false;
-  let addrs: string[];
-  try {
-    addrs = isIP(h) ? [h] : (await lookup(h, { all: true })).map((a) => a.address);
-  } catch {
-    return false;
-  }
-  return addrs.length > 0 && addrs.every(isPublicIp);
-}
-
-function isPublicIp(ip: string): boolean {
-  const v4 = ip.startsWith("::ffff:") ? ip.slice(7) : ip;
-  if (isIP(v4) === 4) {
-    const [a, b] = v4.split(".").map(Number);
-    return !(
-      a === 0 || a === 10 || a === 127 || (a === 100 && b >= 64 && b <= 127) || (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 198 && (b === 18 || b === 19)) || a >= 224
-    );
-  }
-  const x = ip.toLowerCase();
-  return !(x === "::" || x === "::1" || x.startsWith("fc") || x.startsWith("fd") || x.startsWith("fe8") || x.startsWith("fe9") || x.startsWith("fea") || x.startsWith("feb"));
+  const r = await safeFetch(url, { headers: { "User-Agent": "NexaBot/0.1 (+profile autofill)", Accept: "text/html,application/pdf;q=0.9,*/*;q=0.5" } });
+  if (!r.ok) return { error: r.reason === "status" ? `That site answered ${r.status}. Try another page or a PDF.` : FAILED[r.reason] };
+  if (r.type === "application/pdf") return { url: r.url.href, host: r.url.hostname, text: "", pdf: Buffer.from(r.body).toString("base64") };
+  if (!r.type.includes("html") && !r.type.startsWith("text/")) return { error: "That link isn't a web page or a PDF." };
+  const text = htmlToText(new TextDecoder().decode(r.body));
+  if (text.length < 80) return { error: "That page has almost no text (it may need JavaScript). Try a PDF." };
+  return { url: r.url.href, host: r.url.hostname.replace(/^www\./, ""), text };
 }
 
 function htmlToText(html: string): string {

@@ -1,5 +1,7 @@
 import "server-only";
 
+import { safeFetch } from "./safeFetch";
+
 /**
  * Finds a company's logo from its website: an <img> marked as a logo first,
  * then the apple-touch icon, the Open Graph image, and finally the favicon.
@@ -7,43 +9,37 @@ import "server-only";
  */
 
 const MAX = 400_000;
+const MAX_HTML = 1_000_000;
 const TIMEOUT = 5000;
+const HEADERS = { "user-agent": "Mozilla/5.0 (Nexa logo finder)" };
 
-/** Only public https hosts, so a document can't point the server at internal addresses. */
-function safeUrl(raw: string, base?: string): URL | null {
+/**
+ * The website comes from a document a user uploaded, so it is untrusted: only https here,
+ * and safeFetch checks every host and redirect against private and internal addresses.
+ */
+function parse(raw: string, base?: string): URL | null {
   try {
     const url = new URL(raw, base);
-    if (url.protocol !== "https:") return null;
-    const host = url.hostname;
-    if (host === "localhost" || /^[\d.]+$/.test(host) || host.includes(":") || host.endsWith(".local") || host.endsWith(".internal")) return null;
-    return url;
+    return url.protocol === "https:" ? url : null;
   } catch {
     return null;
   }
 }
 
-async function get(url: URL) {
-  const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT), redirect: "follow", headers: { "user-agent": "Mozilla/5.0 (Nexa logo finder)" } });
-  if (!res.ok) return null;
-  return res;
-}
+const get = (url: URL, maxBytes: number) => safeFetch(url, { timeout: TIMEOUT, maxBytes, protocols: ["https:"], headers: HEADERS });
 
 async function asDataUrl(url: URL): Promise<string | null> {
-  const res = await get(url).catch(() => null);
-  if (!res) return null;
-  const type = (res.headers.get("content-type") ?? "").split(";")[0]!.trim();
-  if (!type.startsWith("image/")) return null;
-  const buf = Buffer.from(await res.arrayBuffer());
-  if (buf.length === 0 || buf.length > MAX) return null;
-  return `data:${type};base64,${buf.toString("base64")}`;
+  const res = await get(url, MAX);
+  if (!res.ok || !res.type.startsWith("image/") || res.body.length === 0) return null;
+  return `data:${res.type};base64,${Buffer.from(res.body).toString("base64")}`;
 }
 
 export async function findLogo(website?: string): Promise<string | undefined> {
-  const home = website ? safeUrl(website) : null;
+  const home = website ? parse(website) : null;
   if (!home) return undefined;
-  const res = await get(home).catch(() => null);
-  const html = res ? (await res.text()).slice(0, 400_000) : "";
-  const base = res?.url ?? home.href;
+  const res = await get(home, MAX_HTML);
+  const html = res.ok ? new TextDecoder().decode(res.body) : "";
+  const base = res.ok ? res.url.href : home.href;
 
   const attr = (tag: string, name: string) => tag.match(new RegExp(`${name}\\s*=\\s*["']([^"']+)["']`, "i"))?.[1];
   const candidates: string[] = [];
@@ -63,7 +59,7 @@ export async function findLogo(website?: string): Promise<string | undefined> {
   candidates.push("/favicon.ico");
 
   for (const c of candidates.filter(Boolean).slice(0, 6)) {
-    const url = safeUrl(c.replace(/&amp;/g, "&"), base);
+    const url = parse(c.replace(/&amp;/g, "&"), base);
     if (!url) continue;
     const data = await asDataUrl(url);
     if (data) return data;
