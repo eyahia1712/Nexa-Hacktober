@@ -1,21 +1,31 @@
-import type { Metadata } from "next";
-import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Archivo, Archivo_Narrow, Geist_Mono } from "next/font/google";
+
+import { LangProvider } from "@/lib/i18n";
+
 import "./globals.css";
 
-// Plus Jakarta Sans was designed in Jakarta: an ASEAN typeface for an ASEAN product.
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jbmono" });
+// Archivo for reading, Archivo Narrow for uppercase labels, Geist Mono for numbers.
+const archivo = Archivo({ subsets: ["latin", "latin-ext", "vietnamese"], variable: "--font-sans" });
+const archivoNarrow = Archivo_Narrow({ subsets: ["latin", "latin-ext", "vietnamese"], variable: "--font-narrow" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
+const logoFace = Archivo({ subsets: ["latin"], style: ["italic"], weight: ["800"], variable: "--font-logo" });
 
 export const metadata: Metadata = {
-  title: "Nexa · Ten countries. One door.",
-  description:
-    "Upload your pitch deck. Gemma 4 finds the ASEAN grants, programmes, investors and partners you qualify for, and tracks each one until it becomes a deal.",
+  title: "Nexa",
+  description: "Eleven countries. One door. Nexa finds the grants, investors, programmes and partners across ASEAN that a startup actually qualifies for. Built with Gemma 4 at Hacktoberfest KL 2026.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport: Viewport = {
+  themeColor: "#faf9f5",
+};
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${jakarta.variable} ${mono.variable}`}>
-      <body className="min-h-screen font-sans">{children}</body>
+    <html lang="en" className={`${archivo.variable} ${archivoNarrow.variable} ${geistMono.variable} ${logoFace.variable}`}>
+      <body className="min-h-dvh">
+        <LangProvider>{children}</LangProvider>
+      </body>
     </html>
   );
 }
