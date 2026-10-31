@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
 
 /**
  * Four companies, four situations, as profile cards. Same anatomy as the
@@ -13,9 +14,9 @@ export interface PersonaCard {
   answer: string;
   chips: string[];
   score: { value: string; label: string };
-  /** A photo or banner. Without one, the card draws flags on a colour. */
+  /** A photo or banner. Without one, the card shows the company logo on its brand colour. */
   photo?: string;
-  flags?: string;
+  logo?: ReactNode;
   color: string;
 }
 
@@ -37,11 +38,14 @@ function ProfileCard({ card, index }: { card: PersonaCard; index: number }) {
       style={{ ["--i" as string]: index, background: card.color }}
     >
       {card.photo ? (
-        <Image src={card.photo} alt="" fill sizes="(max-width: 1024px) 50vw, 280px" className="object-cover" style={{ transform: "scale(1.32)", transformOrigin: "50% 92%" }} />
+        <Image src={card.photo} alt="" fill sizes="(max-width: 1024px) 50vw, 280px" className="object-cover" style={{ transform: "scale(1.18)", transformOrigin: "50% 100%" }} />
       ) : (
         <div aria-hidden className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 opacity-25 [background-image:radial-gradient(rgb(255_255_255/55%)_1px,transparent_1px)] [background-size:16px_16px]" />
-          <p className={`absolute top-[21%] right-0 left-0 px-6 text-center leading-[1.15] tracking-[0.04em] whitespace-pre-line drop-shadow-[0_10px_18px_rgb(0_0_0/35%)] ${(card.flags?.length ?? 0) > 4 ? "text-[38px]" : "text-[78px]"}`}>{card.flags}</p>
+          <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(rgb(255_255_255/60%)_1px,transparent_1px)] [background-size:16px_16px]" />
+          <div className="absolute -top-16 -right-16 size-56 rounded-full bg-white/10" />
+          <div className="absolute top-[17%] right-0 left-0 grid place-items-center">
+            <span className="grid size-[104px] place-items-center rounded-[26px] bg-white shadow-[0_18px_36px_-14px_rgb(0_0_0/55%)]">{card.logo}</span>
+          </div>
         </div>
       )}
       <div
