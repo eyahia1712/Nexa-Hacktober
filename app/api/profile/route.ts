@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { prepare, type Upload } from "@/lib/extract";
 import { cleanProfile, cleanRequest, gemma, hasKey, parseJson, PROFILE_PROMPT, SAMPLE_PROFILE } from "@/lib/gemma";
+import { findLogo } from "@/lib/logo";
 
 export const maxDuration = 60;
 
@@ -18,6 +19,8 @@ export async function POST(req: Request) {
     const answer = await gemma(body ? `${PROFILE_PROMPT}\n\n${body}` : PROFILE_PROMPT, files);
     const raw = parseJson<Record<string, unknown>>(answer);
     const profile = cleanProfile(raw);
+    // The logo comes from the company website named in the document.
+    profile.logo = await findLogo(profile.website).catch(() => undefined);
     const hasNeeds = Array.isArray(raw.needs) && raw.needs.length > 0;
     return NextResponse.json({ profile, request: hasNeeds ? cleanRequest(raw, profile.country) : null, mode: "gemma" });
   } catch (e) {
