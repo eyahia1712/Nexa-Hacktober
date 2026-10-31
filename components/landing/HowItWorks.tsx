@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Icon } from "@/components/Icon";
 import { useI18n } from "@/lib/i18n";
-import { matchOne } from "@/lib/match";
-import { OPPORTUNITIES } from "@/lib/opportunities";
-import { COUNTRIES, COUNTRY_CODES, STAGES, STAGE_LABEL, type Profile, type Stage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 /** How it works, shown rather than told: five steps, each with a small live preview. */
@@ -21,17 +18,8 @@ const STEPS = [
 
 export function HowItWorks() {
   const { t } = useI18n();
-  const [step, setStep] = useState(2);
-  const [stage, setStage] = useState<Stage>("seed");
-
-  // Real rules over the real dataset: what a Malaysian company could apply to today.
-  const open = useMemo(() => {
-    const p: Profile = { id: "x", name: "Demo", oneLiner: "", country: "MY", sectors: ["ai"], stage, teamSize: 5, source: "form" };
-    const r = { needs: [], targetMarkets: [] };
-    const res = OPPORTUNITIES.map((o) => matchOne(p, r, o));
-    const byCountry = Object.fromEntries(COUNTRY_CODES.map((c) => [c, res.filter((m) => m.opp.country === c && m.verdict !== "no").length]));
-    return { total: res.filter((m) => m.verdict !== "no").length, byCountry };
-  }, [stage]);
+  // Opens on "Your pathway", the step that matters most.
+  const [step, setStep] = useState(3);
 
   return (
     <div className="mt-10 space-y-4">
@@ -70,49 +58,6 @@ export function HowItWorks() {
           </div>
         </div>
       </div>
-
-      <div className="rounded-2xl border border-line-strong/50 bg-card p-6 shadow-[0_14px_34px_-24px_rgb(0_0_0/45%)]">
-        <div className="grid items-center gap-4 md:grid-cols-[1fr_auto_auto]">
-          <div>
-            <p className="nx-micro text-ink-3">{t("how.rules")}</p>
-            <p className="mt-1 text-[15px] text-ink-2">{t("how.rulesSub")}</p>
-          </div>
-          <div className="inline-flex flex-wrap rounded-lg border border-line bg-paper p-0.5">
-            {STAGES.map((s) => (
-              <button
-                key={s}
-                onClick={() => setStage(s)}
-                className={cn(
-                  "nx-focus inline-flex h-9 items-center rounded-md px-3 text-[13px] transition-colors",
-                  s === stage ? "bg-card text-ink shadow-[0_2px_8px_-3px_rgb(0_0_0/30%)]" : "text-ink-2 hover:text-ink",
-                )}
-              >
-                {STAGE_LABEL[s]}
-              </button>
-            ))}
-          </div>
-          <p className="font-mono text-[40px] leading-none text-asean">
-            {open.total}
-            <span className="ml-2 text-[13px] text-ink-3">
-              / {OPPORTUNITIES.length} {t("how.open")}
-            </span>
-          </p>
-        </div>
-        <div className="mt-5 grid grid-cols-11 gap-1.5">
-          {COUNTRY_CODES.map((c) => {
-            const n = open.byCountry[c] ?? 0;
-            return (
-              <div key={c} className="flex flex-col items-center gap-1.5" title={`${COUNTRIES[c].name}: ${n}`}>
-                <div className="relative h-16 w-full overflow-hidden rounded-md bg-stone">
-                  <span className="absolute inset-x-0 bottom-0 rounded-md bg-asean transition-all duration-700 ease-out" style={{ height: `${Math.min(100, n * 25)}%` }} />
-                </div>
-                <span className="text-[15px] leading-none">{COUNTRIES[c].flag}</span>
-                <span className="font-mono text-[11px] text-ink-3">{n}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }
@@ -124,9 +69,9 @@ function Label({ children }: { children: React.ReactNode }) {
 function PreviewSetup() {
   const { t } = useI18n();
   const ways = [
-    { icon: "flag", title: t("start.tab.sample"), line: "KrackedDevs", color: "#22d41b" },
-    { icon: "upload", title: t("start.tab.upload"), line: "PDF · PPTX · DOCX", color: "#0033a0" },
-    { icon: "edit", title: t("start.tab.form"), line: "2 min", color: "#d0103a" },
+    { icon: "flag", title: t("start.tab.sample"), line: "KrackedDevs", color: "#4C9F38" },
+    { icon: "upload", title: t("start.tab.upload"), line: "PDF · PPTX · DOCX", color: "#0A97D9" },
+    { icon: "edit", title: t("start.tab.form"), line: "2 min", color: "#FD6925" },
   ] as const;
   return (
     <div>
@@ -153,7 +98,7 @@ function PreviewNeed() {
     <div>
       <Label>{t("how.p2")}</Label>
       <div className="flex items-center gap-3 rounded-lg border border-line bg-card px-3 py-2.5">
-        <span className="grid size-9 place-items-center rounded-md bg-asean-red font-mono text-[10px] font-semibold text-white">PPTX</span>
+        <span className="grid size-9 place-items-center rounded-md bg-[#FD6925] font-mono text-[10px] font-semibold text-white">PPTX</span>
         <span className="flex-1 text-[14px]">kd-labs-regional.pptx</span>
         <Icon name="check" size={16} className="text-good" />
       </div>
@@ -195,9 +140,9 @@ function PreviewMatches() {
               <span className="font-mono text-[22px] text-good">{Math.min(98, 15 + sector + needs + market)}</span>
             </div>
             <div className="mt-2 flex h-2 overflow-hidden rounded-full bg-stone">
-              <span className="nx-grow bg-asean" style={{ width: `${sector}%` }} />
-              <span className="nx-grow bg-saffron" style={{ width: `${needs}%` }} />
-              <span className="nx-grow bg-asean-red" style={{ width: `${market}%` }} />
+              <span className="nx-grow" style={{ width: `${sector}%`, background: "#26BDE2" }} />
+              <span className="nx-grow" style={{ width: `${needs}%`, background: "#FCC30B" }} />
+              <span className="nx-grow" style={{ width: `${market}%`, background: "#DD1367" }} />
             </div>
           </li>
         ))}
@@ -222,7 +167,7 @@ function PreviewPathway() {
           <li key={step} className="nx-rise relative" style={{ ["--i" as string]: i * 2 }}>
             <span
               className="absolute top-2.5 -left-[29px] size-5 rounded-full border-[3px] border-white shadow-[0_0_0_1.5px_var(--line-strong)]"
-              style={{ background: ["#0033a0", "#ffc300", "#d0103a", "#0e7a4b"][i] }}
+              style={{ background: ["#2F6BFF", "#FCC30B", "#4C9F38", "#DD1367"][i] }}
             />
             <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-card px-3 py-2.5">
               <span className="text-[14px] font-medium">{step}</span>
