@@ -11,6 +11,7 @@ import { BTN_GHOST, BTN_INK, BTN_SAFFRON, Flag, INPUT, Loading, Micro, Modal, Sc
 import { useI18n } from "@/lib/i18n";
 import { matchAll } from "@/lib/match";
 import { OPPORTUNITIES } from "@/lib/opportunities";
+import { KD_REQUEST } from "@/lib/samples";
 import { getSession, loadProfile, loadRequest, loadTracker, saveRequest, saveTracker, type Session } from "@/lib/store";
 import {
   COUNTRIES,
@@ -44,7 +45,8 @@ export default function Dashboard() {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [request, setRequest] = useState<Request | null>(null);
-  const [editingNeed, setEditingNeed] = useState(false);
+  // The full dashboard opens only after the company says what it needs (once per visit).
+  const [ready, setReadyState] = useState(false);
   const [tracker, setTracker] = useState<Record<string, TrackStage>>({});
   const [tab, setTab] = useState<Tab>("overview");
   const [chosen, setChosen] = useState<string | null>(null);
@@ -58,7 +60,21 @@ export default function Dashboard() {
     setProfile(p);
     setRequest(loadRequest(s.email));
     setTracker(loadTracker(s.email));
+    try {
+      setReadyState(sessionStorage.getItem(`nexa-ready:${s.email}`) === "1" && !!loadRequest(s.email));
+    } catch {
+      /* no storage: start with the profile */
+    }
   }, [router]);
+
+  const setReady = (v: boolean) => {
+    setReadyState(v);
+    try {
+      if (session) sessionStorage.setItem(`nexa-ready:${session.email}`, v ? "1" : "0");
+    } catch {
+      /* fine */
+    }
+  };
 
   const matches = useMemo(() => (profile && request ? matchAll(profile, request, OPPORTUNITIES) : []), [profile, request]);
 
@@ -86,7 +102,6 @@ export default function Dashboard() {
 
   if (!session || !profile) return <div className="min-h-dvh bg-paper" />;
 
-  const showComposer = !request || editingNeed;
 
   return (
     <div className="min-h-dvh bg-paper text-ink">
@@ -106,16 +121,29 @@ export default function Dashboard() {
       <main className="mx-auto w-full max-w-[1240px] px-5 pt-7 pb-20 md:px-8">
         <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,330px)_minmax(0,1fr)] lg:gap-10">
           <aside className="lg:sticky lg:top-20">
-            <CompanyCard profile={profile} request={request} onEdit={() => router.push("/start?edit=1")} />
+            <CompanyCard profile={profile} request={ready ? request : null} onEdit={() => router.push("/start?edit=1")} />
           </aside>
 
           <section className="min-w-0">
+            {!ready || !request ? (
+              <NeedComposer
+                profile={profile}
+                initial={request}
+                onDone={(r) => {
+                  saveRequest(session.email, r);
+                  setRequest(r);
+                  setTab("overview");
+                  setReady(true);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              />
+            ) : (
+              <>
             <nav className="-mx-1 flex gap-1 overflow-x-auto pb-1" aria-label="Dashboard">
               {TABS.map((item, i) => (
                 <button
                   key={item.id}
                   onClick={() => setTab(item.id)}
-                  disabled={!request && item.id !== "overview"}
                   aria-current={tab === item.id ? "page" : undefined}
                   className={cn(
                     "nx-focus inline-flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-[14px] transition-colors disabled:opacity-40",
@@ -132,21 +160,8 @@ export default function Dashboard() {
             </nav>
 
             <div className="mt-6" key={tab}>
-              {tab === "overview" ? (
-                showComposer ? (
-                  <NeedComposer
-                    profile={profile}
-                    initial={request}
-                    onCancel={request ? () => setEditingNeed(false) : undefined}
-                    onDone={(r) => {
-                      saveRequest(session.email, r);
-                      setRequest(r);
-                      setEditingNeed(false);
-                    }}
-                  />
-                ) : (
-                  <Overview profile={profile} request={request!} matches={matches} tracker={tracker} onEditNeed={() => setEditingNeed(true)} onPath={openPath} onTrack={track} onAll={() => go("opps")} />
-                )
+              {tab === "overview" && request ? (
+                <Overview profile={profile} request={request} matches={matches} tracker={tracker} onEditNeed={() => setReady(false)} onPath={openPath} onTrack={track} onAll={() => go("opps")} />
               ) : null}
               {tab === "opps" ? <Opportunities matches={matches} tracker={tracker} onPath={openPath} onTrack={track} /> : null}
               {tab === "pathway" && request ? (
@@ -155,6 +170,8 @@ export default function Dashboard() {
               {tab === "tracker" ? <Tracker matches={matches} tracker={tracker} onTrack={track} onPath={openPath} /> : null}
               {tab === "ask" && request ? <Ask profile={profile} request={request} matches={matches} /> : null}
             </div>
+              </>
+            )}
           </section>
         </div>
       </main>
@@ -164,34 +181,41 @@ export default function Dashboard() {
 
 /* ── Step 3: what are you looking for? ─────────────────────── */
 
-function NeedComposer({ profile, initial, onDone, onCancel }: { profile: Profile; initial: Request | null; onDone: (r: Request) => void; onCancel?: () => void }) {
+function NeedComposer({ profile, initial, onDone }: { profile: Profile; initial: Request | null; onDone: (r: Request) => void }) {
   const { t } = useI18n();
   const file = useRef<HTMLInputElement>(null);
   const [r, setR] = useState<Request>(initial ?? { needs: [], targetMarkets: [] });
   const [busy, setBusy] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
+  const [drag, setDrag] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isKd = profile.id === "sample-kd";
 
-  const read = async (f?: File) => {
-    if (!f) return;
+  // Gemma reads the file (or KD's sample pitch), then the matches open straight away.
+  const read = async (body: { uploads?: { name: string; mime: string; data: string }[]; text?: string }) => {
     setBusy(true);
     setError(null);
     try {
       const res = await fetch("/api/need", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ profile: { ...profile, logo: undefined, banner: undefined }, text: r.notes ?? "", uploads: [{ name: f.name, mime: f.type || "application/octet-stream", data: await fileToBase64(f) }] }),
+        body: JSON.stringify({ profile: { ...profile, logo: undefined, banner: undefined }, ...body }),
       });
       const json = await res.json();
       if (!res.ok || !json.request) throw new Error();
-      setR(json.request);
-      setNote(t("need.read", { file: f.name }));
+      onDone(json.request);
     } catch {
       setError(t("common.error"));
-    } finally {
       setBusy(false);
     }
   };
+  const upload = async (f?: File) => {
+    if (!f) return;
+    await read({ uploads: [{ name: f.name, mime: f.type || "application/octet-stream", data: await fileToBase64(f) }] });
+  };
+  const kdPitch = () =>
+    read({
+      text: `KrackedDevs pitch. ${KD_REQUEST.notes} Ask: ${KD_REQUEST.ask}. Looking for: ${KD_REQUEST.needs.map((n) => NEED_LABEL[n]).join(", ")}. Target cities: Singapore, Jakarta, Ho Chi Minh City.`,
+    });
 
   const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
@@ -201,103 +225,128 @@ function NeedComposer({ profile, initial, onDone, onCancel }: { profile: Profile
       <h2 className="mt-2 text-[clamp(1.6rem,3vw,2.3rem)] leading-tight font-medium tracking-[-0.02em]">{t("need.title", { name: profile.name })}</h2>
       <p className="mt-2 max-w-2xl text-[15px] text-ink-2">{t("need.sub")}</p>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-[1fr_300px]">
-        <div className="nx-card p-6">
-          <Micro>{t("need.what")}</Micro>
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {NEEDS.map((n, i) => {
-              const on = r.needs.includes(n);
-              return (
-                <button
-                  key={n}
-                  onClick={() => setR({ ...r, needs: toggle(r.needs, n) })}
-                  aria-pressed={on}
-                  className={cn(
-                    "nx-focus flex items-center gap-2.5 rounded-xl border px-3 py-3 text-left text-[14px] transition-all",
-                    on ? "border-ink bg-ink text-paper" : "border-line bg-card hover:border-line-strong",
-                  )}
-                >
-                  <span className="size-2.5 shrink-0 rounded-full" style={{ background: ["#0033a0", "#ffc300", "#d0103a", "#0e7a4b", "#7c3aed", "#0891b2"][i] }} />
-                  {NEED_LABEL[n]}
-                </button>
-              );
-            })}
-          </div>
-
-          <Micro className="mt-6">{t("need.where")}</Micro>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {COUNTRY_CODES.filter((c) => c !== profile.country).map((c) => {
-              const on = r.targetMarkets.includes(c);
-              return (
-                <button
-                  key={c}
-                  onClick={() => setR({ ...r, targetMarkets: toggle(r.targetMarkets, c) })}
-                  aria-pressed={on}
-                  className={cn(
-                    "nx-focus inline-flex h-9 items-center gap-2 rounded-full border px-3 text-[13px] transition-colors",
-                    on ? "border-asean bg-asean-soft text-asean" : "border-line bg-card text-ink-2 hover:border-line-strong",
-                  )}
-                >
-                  <span className="text-[15px]">{COUNTRIES[c].flag}</span>
-                  {COUNTRIES[c].name}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <label className="block">
-              <Micro>{t("need.ask")}</Micro>
-              <input className={INPUT} value={r.ask ?? ""} onChange={(e) => setR({ ...r, ask: e.target.value || undefined })} placeholder={t("need.askPh")} />
-            </label>
-            <label className="block">
-              <Micro>{t("need.notes")}</Micro>
-              <input className={INPUT} value={r.notes ?? ""} onChange={(e) => setR({ ...r, notes: e.target.value || undefined })} />
-            </label>
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <button className={cn(BTN_SAFFRON, "min-h-11 px-5")} disabled={!r.needs.length || busy} onClick={() => onDone(r)}>
-              {t("need.find")}
-              <Icon name="arrow" size={15} />
-            </button>
-            {onCancel ? (
-              <button className={BTN_GHOST} onClick={onCancel}>
-                {t("f.back")}
-              </button>
-            ) : null}
-            {!r.needs.length ? <p className="text-[13px] text-ink-3">{t("need.pick")}</p> : null}
-          </div>
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDrag(true);
+        }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDrag(false);
+          void upload(e.dataTransfer.files[0]);
+        }}
+        className={cn(
+          "nx-dotgrid mt-6 flex flex-col items-center rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-colors",
+          drag ? "border-ink bg-saffron-soft" : "border-line-strong bg-card",
+        )}
+      >
+        <div className="flex gap-2">
+          {["PDF", "PPTX", "DOCX"].map((f, i) => (
+            <span key={f} className="grid h-12 w-10 place-items-center rounded-md font-mono text-[9.5px] font-semibold text-white shadow-[0_8px_16px_-8px_rgb(0_0_0/45%)]" style={{ background: ["#E5243B", "#FD6925", "#2F6BFF"][i], transform: `rotate(${(i - 1) * 7}deg)` }}>
+              {f}
+            </span>
+          ))}
         </div>
-
-        <div className="nx-card nx-dotgrid flex flex-col items-center justify-center p-6 text-center">
-          <div className="grid size-12 place-items-center rounded-xl bg-asean text-white">
-            <Icon name="doc" size={22} />
+        <p className="mt-5 text-[19px] font-medium">{busy ? t("need.reading") : t("need.uploadT")}</p>
+        <p className="mt-1 max-w-md text-[13.5px] text-ink-3">{busy ? "Gemma 4" : t("need.uploadS")}</p>
+        {busy ? (
+          <div className="mt-5">
+            <Loading label="Gemma 4" />
           </div>
-          <p className="mt-4 text-[16px] font-medium">{t("need.upload")}</p>
-          <p className="mt-1 text-[12.5px] text-ink-3">PDF · PPTX · DOCX · Gemma 4</p>
-          {busy ? (
-            <div className="mt-4">
-              <Loading label={t("need.reading")} />
-            </div>
-          ) : (
-            <button className={cn(BTN_INK, "mt-4")} onClick={() => file.current?.click()}>
+        ) : (
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <button className={BTN_INK} onClick={() => file.current?.click()}>
               <Icon name="upload" size={15} />
               {t("start.choose")}
             </button>
-          )}
-          <input
-            ref={file}
-            type="file"
-            accept=".pdf,.pptx,.docx,.txt,image/*"
-            className="hidden"
-            onChange={(e) => {
-              void read(e.target.files?.[0]);
-              e.target.value = "";
-            }}
-          />
-          {note ? <p className="mt-4 text-[12.5px] text-good">{note}</p> : null}
-          {error ? <p className="mt-4 text-[12.5px] text-bad">{error}</p> : null}
+            {isKd ? (
+              <button className={BTN_SAFFRON} onClick={() => void kdPitch()}>
+                <Icon name="spark" size={15} />
+                {t("need.kdPitch")}
+              </button>
+            ) : null}
+          </div>
+        )}
+        <input
+          ref={file}
+          type="file"
+          accept=".pdf,.pptx,.docx,.txt,image/*"
+          className="hidden"
+          onChange={(e) => {
+            void upload(e.target.files?.[0]);
+            e.target.value = "";
+          }}
+        />
+        {error ? <p className="mt-4 text-[13px] text-bad">{error}</p> : null}
+      </div>
+
+      <div className="my-6 flex items-center gap-4">
+        <span className="h-px flex-1 bg-line" />
+        <span className="nx-micro text-ink-3">{t("need.or")}</span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
+
+      <div className="nx-card p-6">
+        <Micro>{t("need.what")}</Micro>
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {NEEDS.map((n, i) => {
+            const on = r.needs.includes(n);
+            return (
+              <button
+                key={n}
+                onClick={() => setR({ ...r, needs: toggle(r.needs, n) })}
+                aria-pressed={on}
+                className={cn(
+                  "nx-focus flex items-center gap-2.5 rounded-xl border px-3 py-3 text-left text-[14px] transition-all",
+                  on ? "border-ink bg-ink text-paper" : "border-line bg-card hover:border-line-strong",
+                )}
+              >
+                <span className="size-2.5 shrink-0 rounded-full" style={{ background: ["#2F6BFF", "#FCC30B", "#E5243B", "#4C9F38", "#A21942", "#26BDE2"][i] }} />
+                {NEED_LABEL[n]}
+              </button>
+            );
+          })}
+        </div>
+
+        <Micro className="mt-6">{t("need.where")}</Micro>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {COUNTRY_CODES.filter((c) => c !== profile.country).map((c) => {
+            const on = r.targetMarkets.includes(c);
+            return (
+              <button
+                key={c}
+                onClick={() => setR({ ...r, targetMarkets: toggle(r.targetMarkets, c) })}
+                aria-pressed={on}
+                className={cn(
+                  "nx-focus inline-flex h-9 items-center gap-2 rounded-full border px-3 text-[13px] transition-colors",
+                  on ? "border-asean bg-asean-soft text-asean" : "border-line bg-card text-ink-2 hover:border-line-strong",
+                )}
+              >
+                <span className="text-[15px]">{COUNTRIES[c].flag}</span>
+                {COUNTRIES[c].name}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <label className="block">
+            <Micro>{t("need.ask")}</Micro>
+            <input className={INPUT} value={r.ask ?? ""} onChange={(e) => setR({ ...r, ask: e.target.value || undefined })} placeholder={t("need.askPh")} />
+          </label>
+          <label className="block">
+            <Micro>{t("need.notes")}</Micro>
+            <input className={INPUT} value={r.notes ?? ""} onChange={(e) => setR({ ...r, notes: e.target.value || undefined })} />
+          </label>
+        </div>
+
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <button className={cn(BTN_SAFFRON, "min-h-11 px-5")} disabled={!r.needs.length || busy} onClick={() => onDone(r)}>
+            {t("need.find")}
+            <Icon name="arrow" size={15} />
+          </button>
+          {!r.needs.length ? <p className="text-[13px] text-ink-3">{t("need.pick")}</p> : null}
         </div>
       </div>
     </div>
