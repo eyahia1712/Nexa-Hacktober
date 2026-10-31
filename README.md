@@ -13,8 +13,10 @@ step-by-step pathway to each one, in 12 languages.**
 
 ![Nexa: Eleven countries. One door.](docs/screenshots/nexa-hero.jpg)
 
-*One door for every founder: the grants, investors and programmes that fit,
-across all 11 ASEAN countries, scored by rules anyone can check.*
+![ASEAN has the resources. Founders just can't find them.](docs/screenshots/nexa-problem.jpg)
+
+*ASEAN has the resources. Founders just can't find them. Nexa is the one door
+to the grants, investors and programmes that fit, across all 11 ASEAN countries.*
 
 ---
 
